@@ -1,0 +1,35 @@
+{
+  "name": "prebooking-backoffice",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "nuxi typecheck",
+    "quality": "npm run typecheck && npm run lint",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.5.1",
+    "@pinia/nuxt": "^0.11.3",
+    "@vee-validate/nuxt": "^4.15.1",
+    "clsx": "^2.1.1",
+    "exceljs": "^4.4.0",
+    "nuxt": "^4.3.1",
+    "nuxt-auth-utils": "^0.5.29",
+    "tailwind-merge": "^3.5.0",
+    "vue": "^3.5.29",
+    "vue-router": "^4.6.4",
+    "xlsx": "^0.18.5",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "^3.2.3",
+    "@nuxt/eslint": "^1.15.2",
+    "@types/node": "^25.3.5"
+  }
+}
