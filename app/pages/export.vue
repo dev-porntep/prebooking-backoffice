@@ -80,11 +80,20 @@ const historyColumns = computed(() => [
   { id: 'actions', header: '' },
 ])
 
-const mockHistory = ref([
-  { id: '1', createdAt: '2026-03-09 14:00', filters: 'ทั้งหมด', totalRows: 500, downloadUrl: '#' },
-  { id: '2', createdAt: '2026-03-08 10:30', filters: 'สถานะ: รอดำเนินการ', totalRows: 120, downloadUrl: '#' },
-  { id: '3', createdAt: '2026-03-07 09:15', filters: 'รุ่น: iPhone 16', totalRows: 85, downloadUrl: '#' },
-])
+interface ExportHistoryItem {
+  id: string
+  createdAt: string
+  filters: string
+  totalRows: number
+  downloadUrl: string
+}
+
+const { data: historyData } = await useAsyncData(
+  'export-history',
+  () => $fetch<{ data: ExportHistoryItem[] }>('/api/export/history'),
+)
+
+const exportHistory = computed(() => historyData.value?.data ?? [])
 
 const hasFilters = computed(() =>
   exportFilter.dateFrom || exportFilter.dateTo || exportFilter.status || exportFilter.deviceModel || exportFilter.branch,
@@ -217,10 +226,10 @@ const hasFilters = computed(() =>
             <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{{ t('export.history.subtitle') }}</p>
           </div>
         </div>
-        <UBadge color="neutral" variant="subtle" size="sm">{{ mockHistory.length }} {{ t('export.history.items') }}</UBadge>
+        <UBadge color="neutral" variant="subtle" size="sm">{{ exportHistory.length }} {{ t('export.history.items') }}</UBadge>
       </div>
 
-      <UTable :data="mockHistory" :columns="historyColumns">
+      <UTable :data="exportHistory" :columns="historyColumns">
         <template #id-cell="{ row }">
           <span class="font-mono text-xs text-slate-400 dark:text-slate-500">#{{ row.original.id }}</span>
         </template>

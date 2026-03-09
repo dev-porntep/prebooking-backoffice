@@ -18,7 +18,7 @@
     "logout": "Sign Out"
   },
   "pages": {
-    "display": { "title": "Dashboard", "subtitle": "Prebooking Overview" },
+    "home": { "title": "Dashboard", "subtitle": "Prebooking Overview" },
     "import": { "title": "Import Excel", "subtitle": "Import data from Excel file" },
     "export": { "title": "Export Excel", "subtitle": "Export data to Excel file" }
   },
@@ -29,7 +29,7 @@
     "cancelled": "Cancelled",
     "completed": "Completed"
   },
-  "display": {
+  "home": {
     "title": "Prebooking Dashboard",
     "updated": "Data as of March 9, 2026 · Auto-updated every 5 minutes",
     "refresh": "Refresh",
@@ -175,7 +175,7 @@
       "success": "Export complete! File is ready to download.",
       "download": "Downloading file..."
     },
-    "display": {
+    "home": {
       "refreshed": "Data refreshed successfully"
     }
   }

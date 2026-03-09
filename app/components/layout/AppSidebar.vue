@@ -9,7 +9,7 @@ const navigation = computed(() => [
     label: t('nav.dashboard.label'),
     sublabel: t('nav.dashboard.sublabel'),
     icon: 'i-lucide-layout-dashboard',
-    to: '/display',
+    to: '/',
   },
   {
     label: t('nav.import.label'),

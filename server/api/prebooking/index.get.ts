@@ -15,5 +15,12 @@ export default defineEventHandler(async (event) => {
     page: Number(query['page']) || 1,
     limit: Number(query['limit']) || 20,
     totalPages: 25,
+    stats: {
+      total: 500,
+      pending: 120,
+      confirmed: 350,
+      cancelled: 30,
+      completed: 0,
+    },
   }
 })

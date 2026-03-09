@@ -7,7 +7,6 @@ const breadcrumbs = computed(() => {
   ]
 
   const routeMap: Record<string, string> = {
-    '/display': 'Display',
     '/import': 'Import Excel',
     '/export': 'Export Excel',
     '/login': 'Login',

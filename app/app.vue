@@ -10,6 +10,8 @@ useHead({
     { key: 'theme-color', name: 'theme-color', content: color },
   ],
   link: [
+    { rel: 'icon', type: 'image/png', href: '/icon.png' },
+    { rel: 'apple-touch-icon', href: '/icon.png' },
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
     { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap' },
@@ -19,6 +21,15 @@ useHead({
   ],
   htmlAttrs: { lang: 'th' },
   titleTemplate: '%s | Prebooking Back Office',
+})
+
+useSeoMeta({
+  title: 'Prebooking Back Office',
+  description: 'ระบบจัดการหลังบ้าน Prebooking สำหรับอำนวยความสะดวกในการจองและจัดการสินค้า',
+  ogTitle: 'Prebooking Back Office',
+  ogDescription: 'ระบบจัดการหลังบ้าน Prebooking สำหรับอำนวยความสะดวกในการจองและจัดการสินค้า',
+  ogImage: '/icon.png',
+  twitterCard: 'summary_large_image',
 })
 </script>
 

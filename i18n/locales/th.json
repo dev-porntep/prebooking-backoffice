@@ -18,7 +18,7 @@
     "logout": "ออกจากระบบ"
   },
   "pages": {
-    "display": { "title": "Dashboard", "subtitle": "ภาพรวมข้อมูล Prebooking" },
+    "home": { "title": "Dashboard", "subtitle": "ภาพรวมข้อมูล Prebooking" },
     "import": { "title": "Import Excel", "subtitle": "นำเข้าข้อมูลจากไฟล์ Excel" },
     "export": { "title": "Export Excel", "subtitle": "ส่งออกข้อมูลเป็นไฟล์ Excel" }
   },
@@ -29,7 +29,7 @@
     "cancelled": "ยกเลิก",
     "completed": "เสร็จสิ้น"
   },
-  "display": {
+  "home": {
     "title": "Prebooking Dashboard",
     "updated": "ข้อมูล ณ วันที่ 9 มีนาคม 2026 · อัปเดตอัตโนมัติทุก 5 นาที",
     "refresh": "รีเฟรช",
@@ -175,7 +175,7 @@
       "success": "Export สำเร็จ! ไฟล์พร้อมดาวน์โหลดแล้ว",
       "download": "กำลังดาวน์โหลดไฟล์..."
     },
-    "display": {
+    "home": {
       "refreshed": "อัปเดตข้อมูลเรียบร้อยแล้ว"
     }
   }

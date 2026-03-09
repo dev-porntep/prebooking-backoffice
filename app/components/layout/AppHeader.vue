@@ -34,7 +34,7 @@ const userMenuItems = computed(() => [
 ])
 
 const pageTitleMap = computed((): Record<string, { title: string; subtitle: string }> => ({
-  '/display': { title: t('pages.display.title'), subtitle: t('pages.display.subtitle') },
+  '/': { title: t('pages.home.title'), subtitle: t('pages.home.subtitle') },
   '/import': { title: t('pages.import.title'), subtitle: t('pages.import.subtitle') },
   '/export': { title: t('pages.export.title'), subtitle: t('pages.export.subtitle') },
 }))
