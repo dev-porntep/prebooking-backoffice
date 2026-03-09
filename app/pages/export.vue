@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { toast } from 'vue3-toastify'
+
 const { t } = useI18n()
 
 definePageMeta({ title: 'Export Excel' })
@@ -60,8 +62,13 @@ const startExport = () => {
       exportProgress.value = 100
       clearInterval(interval)
       isExporting.value = false
+      toast.success(t('toast.export.success'))
     }
   }, 500)
+}
+
+const handleDownload = () => {
+  toast.info(t('toast.export.download'))
 }
 
 // ── Export History ────────────────────────────────────
@@ -239,6 +246,7 @@ const hasFilters = computed(() =>
             variant="ghost"
             size="xs"
             :label="t('export.history.download')"
+            @click="handleDownload"
           />
         </template>
       </UTable>

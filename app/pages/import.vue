@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { toast } from 'vue3-toastify'
+
 const { t } = useI18n()
 
 definePageMeta({ title: 'Import Excel' })
@@ -42,23 +44,33 @@ const previewData = ref({
 const importResult = ref({ success: 147, failed: 3 })
 
 // ── Handlers ────────────────────────────────────────
+const isValidFileType = (file: File) =>
+  /\.(xlsx|xls)$/i.test(file.name)
+
 const handleFileSelect = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
-  if (file) {
-    uploadedFile.value = file
-    step.value = 'preview'
+  if (!file) return
+  if (!isValidFileType(file)) {
+    toast.error(t('toast.import.invalidType'))
+    target.value = ''
+    return
   }
+  uploadedFile.value = file
+  step.value = 'preview'
 }
 
 const handleDrop = (event: DragEvent) => {
   event.preventDefault()
   isDragOver.value = false
   const file = event.dataTransfer?.files?.[0]
-  if (file) {
-    uploadedFile.value = file
-    step.value = 'preview'
+  if (!file) return
+  if (!isValidFileType(file)) {
+    toast.error(t('toast.import.invalidType'))
+    return
   }
+  uploadedFile.value = file
+  step.value = 'preview'
 }
 
 const handleDragOver = (event: DragEvent) => {
@@ -86,6 +98,18 @@ const resetImport = () => {
   step.value = 'upload'
   progress.value = 0
 }
+
+watch(step, (newStep) => {
+  if (newStep !== 'result') return
+  if (importResult.value.failed === 0) {
+    toast.success(t('toast.import.success', { count: importResult.value.success }))
+  } else {
+    toast.warning(t('toast.import.partial', {
+      success: importResult.value.success,
+      failed: importResult.value.failed,
+    }))
+  }
+})
 
 const downloadTemplate = () => {
   const link = document.createElement('a')

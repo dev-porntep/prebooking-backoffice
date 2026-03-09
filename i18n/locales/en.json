@@ -161,5 +161,22 @@
       "desc": "Contact IT Support if you have login issues"
     },
     "footer": "This system is for authorized personnel only"
+  },
+  "toast": {
+    "login": {
+      "error": "Login failed. Please try again."
+    },
+    "import": {
+      "invalidType": "Only .xlsx and .xls files are supported",
+      "success": "Import successful: {count} items",
+      "partial": "Import complete: {success} succeeded, {failed} failed"
+    },
+    "export": {
+      "success": "Export complete! File is ready to download.",
+      "download": "Downloading file..."
+    },
+    "display": {
+      "refreshed": "Data refreshed successfully"
+    }
   }
 }

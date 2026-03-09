@@ -66,6 +66,7 @@ export default defineNuxtConfig({
     },
     experimental: {
       tasks: true,
+      asyncContext: true,
     },
   },
 })

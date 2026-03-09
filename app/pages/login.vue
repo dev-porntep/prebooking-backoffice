@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { toast } from 'vue3-toastify'
+
 const { t } = useI18n()
 
 definePageMeta({
@@ -16,6 +18,7 @@ const handleSSOLogin = async () => {
     await navigateTo('/api/auth/sso', { external: true })
   } catch {
     isLoading.value = false
+    toast.error(t('toast.login.error'))
   }
 }
 </script>

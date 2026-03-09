@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PrebookingStatus, PrebookingFilter } from '~/types/prebooking'
+import { toast } from 'vue3-toastify'
 
 const { t } = useI18n()
 
@@ -141,6 +142,11 @@ const statusLabelMap = computed((): Record<PrebookingStatus, string> => ({
   completed: t('status.completed'),
 }))
 
+// ── Refresh ─────────────────────────────────────────
+const handleRefresh = () => {
+  toast.success(t('toast.display.refreshed'))
+}
+
 // ── Detail Slideover ────────────────────────────────
 const selectedItem = ref<typeof mockData.value[0] | null>(null)
 const isDetailOpen = ref(false)
@@ -163,7 +169,7 @@ const openDetail = (item: typeof mockData.value[0]) => {
           {{ t('display.updated') }}
         </p>
       </div>
-      <UButton icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" class="shrink-0">
+      <UButton icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" class="shrink-0" @click="handleRefresh">
         {{ t('display.refresh') }}
       </UButton>
     </div>
