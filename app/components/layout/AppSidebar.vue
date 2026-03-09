@@ -1,28 +1,29 @@
 <script setup lang="ts">
+const { t } = useI18n()
 const route = useRoute()
 
 defineEmits(['close'])
 
-const navigation = [
+const navigation = computed(() => [
   {
-    label: 'Dashboard',
-    sublabel: 'ดูข้อมูล Prebooking',
+    label: t('nav.dashboard.label'),
+    sublabel: t('nav.dashboard.sublabel'),
     icon: 'i-lucide-layout-dashboard',
     to: '/display',
   },
   {
-    label: 'Import Excel',
-    sublabel: 'นำเข้าข้อมูล',
+    label: t('nav.import.label'),
+    sublabel: t('nav.import.sublabel'),
     icon: 'i-lucide-upload',
     to: '/import',
   },
   {
-    label: 'Export Excel',
-    sublabel: 'ส่งออกข้อมูล',
+    label: t('nav.export.label'),
+    sublabel: t('nav.export.sublabel'),
     icon: 'i-lucide-download',
     to: '/export',
   },
-]
+])
 
 const isActive = (path: string) => route.path === path
 </script>
@@ -47,8 +48,8 @@ const isActive = (path: string) => route.path === path
         </div>
         <!-- Title -->
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-bold tracking-wide text-white leading-none">Prebooking</p>
-          <p class="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-red-200/70 leading-none">Back Office</p>
+          <p class="text-sm font-bold tracking-wide text-white leading-none">{{ $t('app.name') }}</p>
+          <p class="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-red-200/70 leading-none">{{ $t('app.subtitle') }}</p>
         </div>
         <!-- Mobile close button -->
         <button
@@ -62,7 +63,7 @@ const isActive = (path: string) => route.path === path
 
     <!-- ─── Nav label ─────────────────────────────────────── -->
     <div class="px-4 pb-1.5 pt-5">
-      <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">เมนูหลัก</p>
+      <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">{{ $t('nav.menu') }}</p>
     </div>
 
     <!-- ─── Navigation ────────────────────────────────────── -->
@@ -130,7 +131,7 @@ const isActive = (path: string) => route.path === path
           <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
           <span class="relative inline-flex size-2 rounded-full bg-emerald-500" />
         </span>
-        <p class="text-[11px] text-slate-500">ระบบออนไลน์ · v1.0.0</p>
+        <p class="text-[11px] text-slate-500">{{ $t('system.online') }} · v1.0.0</p>
       </div>
     </div>
   </aside>

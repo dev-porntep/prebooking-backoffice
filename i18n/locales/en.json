@@ -1,0 +1,165 @@
+{
+  "app": {
+    "name": "Prebooking",
+    "subtitle": "Back Office"
+  },
+  "nav": {
+    "menu": "MAIN MENU",
+    "dashboard": { "label": "Dashboard", "sublabel": "View Prebooking Data" },
+    "import": { "label": "Import Excel", "sublabel": "Import Data" },
+    "export": { "label": "Export Excel", "sublabel": "Export Data" }
+  },
+  "system": {
+    "online": "System Online"
+  },
+  "user": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Sign Out"
+  },
+  "pages": {
+    "display": { "title": "Dashboard", "subtitle": "Prebooking Overview" },
+    "import": { "title": "Import Excel", "subtitle": "Import data from Excel file" },
+    "export": { "title": "Export Excel", "subtitle": "Export data to Excel file" }
+  },
+  "status": {
+    "all": "All Status",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "cancelled": "Cancelled",
+    "completed": "Completed"
+  },
+  "display": {
+    "title": "Prebooking Dashboard",
+    "updated": "Data as of March 9, 2026 · Auto-updated every 5 minutes",
+    "refresh": "Refresh",
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled"
+    },
+    "filter": {
+      "title": "Filter",
+      "active": "Active",
+      "search": "Search",
+      "searchPlaceholder": "Customer name, phone, device model...",
+      "status": "Status",
+      "dateFrom": "From Date",
+      "dateTo": "To Date",
+      "reset": "Reset"
+    },
+    "table": {
+      "title": "Prebooking List",
+      "items": "items",
+      "showing": "Showing",
+      "from": "of",
+      "col": {
+        "id": "#",
+        "customerName": "Customer Name",
+        "phone": "Phone",
+        "device": "Device Model",
+        "branch": "Branch",
+        "status": "Status",
+        "date": "Booking Date"
+      }
+    },
+    "detail": {
+      "title": "Prebooking Detail",
+      "device": "Device Model",
+      "branch": "Branch",
+      "date": "Booking Date"
+    }
+  },
+  "import": {
+    "title": "Import Prebooking Data",
+    "subtitle": "Import data from Excel file (.xlsx, .xls)",
+    "downloadTemplate": "Download Template",
+    "steps": {
+      "upload": "Upload File",
+      "preview": "Preview",
+      "importing": "Importing",
+      "done": "Done"
+    },
+    "upload": {
+      "drag": "Drag Excel file here",
+      "drop": "Drop file here!",
+      "support": "Supports {formats} up to {size}",
+      "browse": "Browse Files",
+      "tipRows": "Max 100,000 rows per file",
+      "tipTemplate": "Use the downloaded template to prevent errors"
+    },
+    "preview": {
+      "rows": "rows",
+      "valid": "Valid",
+      "error": "Error",
+      "back": "Select New File",
+      "start": "Import {count} items",
+      "col": {
+        "customerName": "Customer Name",
+        "phone": "Phone",
+        "device": "Device Model",
+        "status": "Status",
+        "remark": "Remarks"
+      }
+    },
+    "importing": {
+      "title": "Importing data...",
+      "desc": "Please wait, don't close this page",
+      "progress": "Progress",
+      "processing": "Processing"
+    },
+    "result": {
+      "title": "Import Complete!",
+      "desc": "Data imported successfully",
+      "success": "Successful",
+      "failed": "Failed",
+      "errorReport": "Download Error Report",
+      "again": "Import Again"
+    }
+  },
+  "export": {
+    "title": "Export Prebooking Data",
+    "subtitle": "Export Prebooking data to Excel file",
+    "condition": "Set Export Conditions",
+    "conditionDesc": "Select filters or leave blank to export all",
+    "quickDate": "Quick Range",
+    "today": "Today",
+    "last7": "Last 7 Days",
+    "last30": "Last 30 Days",
+    "last90": "Last 90 Days",
+    "dateFrom": "Start Date",
+    "dateTo": "End Date",
+    "status": "Status",
+    "device": "Device Model",
+    "branch": "Branch",
+    "devicePlaceholder": "e.g. iPhone 16 Pro",
+    "branchPlaceholder": "e.g. Central Branch",
+    "reset": "Reset Conditions",
+    "activeFilter": "Filters applied",
+    "start": "Export to Excel",
+    "generating": "Generating Excel file...",
+    "history": {
+      "title": "Export History",
+      "subtitle": "Recent exports",
+      "items": "items",
+      "rows": "rows",
+      "colDate": "Export Date",
+      "colFilter": "Conditions",
+      "colRows": "Count",
+      "download": "Download"
+    }
+  },
+  "login": {
+    "title": "Sign In",
+    "desc": "Use your organization's SSO account to sign in",
+    "sso": "Sign in with SSO",
+    "loading": "Signing in...",
+    "or": "or",
+    "help": {
+      "title": "Need help?",
+      "desc": "Contact IT Support if you have login issues"
+    },
+    "footer": "This system is for authorized personnel only"
+  }
+}

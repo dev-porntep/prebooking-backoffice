@@ -1,0 +1,165 @@
+{
+  "app": {
+    "name": "Prebooking",
+    "subtitle": "Back Office"
+  },
+  "nav": {
+    "menu": "เมนูหลัก",
+    "dashboard": { "label": "Dashboard", "sublabel": "ดูข้อมูล Prebooking" },
+    "import": { "label": "Import Excel", "sublabel": "นำเข้าข้อมูล" },
+    "export": { "label": "Export Excel", "sublabel": "ส่งออกข้อมูล" }
+  },
+  "system": {
+    "online": "ระบบออนไลน์"
+  },
+  "user": {
+    "profile": "โปรไฟล์",
+    "settings": "ตั้งค่า",
+    "logout": "ออกจากระบบ"
+  },
+  "pages": {
+    "display": { "title": "Dashboard", "subtitle": "ภาพรวมข้อมูล Prebooking" },
+    "import": { "title": "Import Excel", "subtitle": "นำเข้าข้อมูลจากไฟล์ Excel" },
+    "export": { "title": "Export Excel", "subtitle": "ส่งออกข้อมูลเป็นไฟล์ Excel" }
+  },
+  "status": {
+    "all": "ทุกสถานะ",
+    "pending": "รอดำเนินการ",
+    "confirmed": "ยืนยันแล้ว",
+    "cancelled": "ยกเลิก",
+    "completed": "เสร็จสิ้น"
+  },
+  "display": {
+    "title": "Prebooking Dashboard",
+    "updated": "ข้อมูล ณ วันที่ 9 มีนาคม 2026 · อัปเดตอัตโนมัติทุก 5 นาที",
+    "refresh": "รีเฟรช",
+    "stats": {
+      "total": "ทั้งหมด",
+      "pending": "รอดำเนินการ",
+      "confirmed": "ยืนยันแล้ว",
+      "cancelled": "ยกเลิก"
+    },
+    "filter": {
+      "title": "ตัวกรองข้อมูล",
+      "active": "กรองอยู่",
+      "search": "ค้นหา",
+      "searchPlaceholder": "ชื่อลูกค้า, เบอร์โทร, รุ่นมือถือ...",
+      "status": "สถานะ",
+      "dateFrom": "จากวันที่",
+      "dateTo": "ถึงวันที่",
+      "reset": "ล้าง"
+    },
+    "table": {
+      "title": "รายการ Prebooking",
+      "items": "รายการ",
+      "showing": "แสดง",
+      "from": "จาก",
+      "col": {
+        "id": "#",
+        "customerName": "ชื่อลูกค้า",
+        "phone": "เบอร์โทร",
+        "device": "รุ่นมือถือ",
+        "branch": "สาขา",
+        "status": "สถานะ",
+        "date": "วันที่จอง"
+      }
+    },
+    "detail": {
+      "title": "รายละเอียด Prebooking",
+      "device": "รุ่นมือถือ",
+      "branch": "สาขา",
+      "date": "วันที่จอง"
+    }
+  },
+  "import": {
+    "title": "Import Prebooking Data",
+    "subtitle": "นำเข้าข้อมูลจากไฟล์ Excel (.xlsx, .xls)",
+    "downloadTemplate": "ดาวน์โหลด Template",
+    "steps": {
+      "upload": "อัปโหลดไฟล์",
+      "preview": "ตรวจสอบ",
+      "importing": "นำเข้าข้อมูล",
+      "done": "เสร็จสิ้น"
+    },
+    "upload": {
+      "drag": "ลากไฟล์ Excel มาวางที่นี่",
+      "drop": "วางไฟล์ที่นี่เลย!",
+      "support": "รองรับ {formats} ขนาดไม่เกิน {size}",
+      "browse": "เลือกไฟล์จากเครื่อง",
+      "tipRows": "สูงสุด 100,000 แถวต่อไฟล์",
+      "tipTemplate": "ใช้ template ที่ดาวน์โหลดเพื่อป้องกัน error"
+    },
+    "preview": {
+      "rows": "แถว",
+      "valid": "ถูกต้อง",
+      "error": "ผิดพลาด",
+      "back": "เลือกไฟล์ใหม่",
+      "start": "นำเข้า {count} รายการ",
+      "col": {
+        "customerName": "ชื่อลูกค้า",
+        "phone": "เบอร์โทร",
+        "device": "รุ่นมือถือ",
+        "status": "สถานะ",
+        "remark": "หมายเหตุ"
+      }
+    },
+    "importing": {
+      "title": "กำลังนำเข้าข้อมูล...",
+      "desc": "กรุณารอสักครู่ อย่าปิดหน้านี้",
+      "progress": "ความคืบหน้า",
+      "processing": "กำลังประมวลผล"
+    },
+    "result": {
+      "title": "Import เสร็จสิ้น!",
+      "desc": "นำเข้าข้อมูลสำเร็จแล้ว",
+      "success": "รายการสำเร็จ",
+      "failed": "รายการล้มเหลว",
+      "errorReport": "ดาวน์โหลด Error Report",
+      "again": "Import อีกครั้ง"
+    }
+  },
+  "export": {
+    "title": "Export Prebooking Data",
+    "subtitle": "ส่งออกข้อมูล Prebooking เป็นไฟล์ Excel",
+    "condition": "กำหนดเงื่อนไข Export",
+    "conditionDesc": "เลือกตัวกรองที่ต้องการ หรือปล่อยว่างเพื่อ Export ทั้งหมด",
+    "quickDate": "ช่วงเวลาด่วน",
+    "today": "วันนี้",
+    "last7": "7 วันล่าสุด",
+    "last30": "30 วันล่าสุด",
+    "last90": "90 วันล่าสุด",
+    "dateFrom": "วันที่เริ่มต้น",
+    "dateTo": "วันที่สิ้นสุด",
+    "status": "สถานะ",
+    "device": "รุ่นมือถือ",
+    "branch": "สาขา",
+    "devicePlaceholder": "เช่น iPhone 16 Pro",
+    "branchPlaceholder": "เช่น สาขากลาง",
+    "reset": "รีเซ็ตเงื่อนไข",
+    "activeFilter": "มีตัวกรองที่เลือก",
+    "start": "Export เป็น Excel",
+    "generating": "กำลังสร้างไฟล์ Excel...",
+    "history": {
+      "title": "ประวัติการ Export",
+      "subtitle": "รายการ Export ล่าสุด",
+      "items": "รายการ",
+      "rows": "แถว",
+      "colDate": "วันที่ Export",
+      "colFilter": "เงื่อนไข",
+      "colRows": "จำนวน",
+      "download": "ดาวน์โหลด"
+    }
+  },
+  "login": {
+    "title": "เข้าสู่ระบบ",
+    "desc": "ใช้บัญชี SSO ขององค์กรเพื่อเข้าสู่ระบบ",
+    "sso": "เข้าสู่ระบบด้วย SSO",
+    "loading": "กำลังเข้าสู่ระบบ...",
+    "or": "หรือ",
+    "help": {
+      "title": "ต้องการความช่วยเหลือ?",
+      "desc": "ติดต่อ IT Support หากมีปัญหาในการเข้าสู่ระบบ"
+    },
+    "footer": "ระบบนี้สำหรับพนักงานที่ได้รับอนุญาตเท่านั้น"
+  }
+}

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { t } = useI18n()
 const colorMode = useColorMode()
 const emit = defineEmits(['toggle-sidebar'])
 
@@ -22,24 +23,24 @@ const initials = computed(() => {
     .slice(0, 2)
 })
 
-const userMenuItems = [
+const userMenuItems = computed(() => [
   [
-    { label: 'โปรไฟล์', icon: 'i-lucide-user' },
-    { label: 'ตั้งค่า', icon: 'i-lucide-settings' },
+    { label: t('user.profile'), icon: 'i-lucide-user' },
+    { label: t('user.settings'), icon: 'i-lucide-settings' },
   ],
   [
-    { label: 'ออกจากระบบ', icon: 'i-lucide-log-out', click: () => navigateTo('/login') },
+    { label: t('user.logout'), icon: 'i-lucide-log-out', click: () => navigateTo('/login') },
   ],
-]
+])
 
-const pageTitleMap: Record<string, { title: string; subtitle: string }> = {
-  '/display': { title: 'Dashboard', subtitle: 'ภาพรวมข้อมูล Prebooking' },
-  '/import': { title: 'Import Excel', subtitle: 'นำเข้าข้อมูลจากไฟล์ Excel' },
-  '/export': { title: 'Export Excel', subtitle: 'ส่งออกข้อมูลเป็นไฟล์ Excel' },
-}
+const pageTitleMap = computed((): Record<string, { title: string; subtitle: string }> => ({
+  '/display': { title: t('pages.display.title'), subtitle: t('pages.display.subtitle') },
+  '/import': { title: t('pages.import.title'), subtitle: t('pages.import.subtitle') },
+  '/export': { title: t('pages.export.title'), subtitle: t('pages.export.subtitle') },
+}))
 
 const route = useRoute()
-const pageInfo = computed(() => pageTitleMap[route.path] ?? { title: String(route.meta['title'] ?? 'Dashboard'), subtitle: '' })
+const pageInfo = computed(() => pageTitleMap.value[route.path] ?? { title: String(route.meta['title'] ?? 'Dashboard'), subtitle: '' })
 </script>
 
 <template>
@@ -63,7 +64,10 @@ const pageInfo = computed(() => pageTitleMap[route.path] ?? { title: String(rout
     </div>
 
     <!-- Right-side actions -->
-    <div class="flex items-center gap-0.5">
+    <div class="flex items-center gap-1.5">
+      <!-- Language switcher -->
+      <LayoutLanguageSwitcher />
+
       <!-- Dark mode toggle (ClientOnly prevents SSR/client hydration mismatch) -->
       <ClientOnly>
         <UButton
@@ -92,7 +96,7 @@ const pageInfo = computed(() => pageTitleMap[route.path] ?? { title: String(rout
       </div>
 
       <!-- Divider -->
-      <div class="mx-1.5 h-5 w-px bg-slate-200 dark:bg-white/10" />
+      <div class="mx-1 h-5 w-px bg-slate-200 dark:bg-white/10" />
 
       <!-- User dropdown -->
       <UDropdownMenu :items="userMenuItems">

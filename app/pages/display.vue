@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import type { PrebookingStatus, PrebookingFilter } from '~/types/prebooking'
 
-definePageMeta({
-  title: 'Display',
-})
+const { t } = useI18n()
 
+definePageMeta({ title: 'Display' })
 useHead({ title: 'Display' })
 
 // ── Stats ───────────────────────────────────────────
-const stats = ref([
+const stats = computed(() => [
   {
-    label: 'ทั้งหมด',
+    label: t('display.stats.total'),
     value: 500,
     icon: 'i-lucide-smartphone',
     gradient: 'from-red-600 to-rose-700',
@@ -24,7 +23,7 @@ const stats = ref([
     percent: 100,
   },
   {
-    label: 'รอดำเนินการ',
+    label: t('display.stats.pending'),
     value: 120,
     icon: 'i-lucide-clock',
     gradient: 'from-amber-500 to-orange-500',
@@ -38,7 +37,7 @@ const stats = ref([
     percent: 24,
   },
   {
-    label: 'ยืนยันแล้ว',
+    label: t('display.stats.confirmed'),
     value: 350,
     icon: 'i-lucide-check-circle',
     gradient: 'from-emerald-500 to-teal-500',
@@ -52,7 +51,7 @@ const stats = ref([
     percent: 70,
   },
   {
-    label: 'ยกเลิก',
+    label: t('display.stats.cancelled'),
     value: 30,
     icon: 'i-lucide-x-circle',
     gradient: 'from-red-500 to-rose-500',
@@ -79,13 +78,13 @@ const filter = reactive<PrebookingFilter>({
   limit: 20,
 })
 
-const statusOptions = [
-  { label: 'ทุกสถานะ', value: 'all' },
-  { label: 'รอดำเนินการ', value: 'pending' },
-  { label: 'ยืนยันแล้ว', value: 'confirmed' },
-  { label: 'ยกเลิก', value: 'cancelled' },
-  { label: 'เสร็จสิ้น', value: 'completed' },
-]
+const statusOptions = computed(() => [
+  { label: t('status.all'), value: 'all' },
+  { label: t('status.pending'), value: 'pending' },
+  { label: t('status.confirmed'), value: 'confirmed' },
+  { label: t('status.cancelled'), value: 'cancelled' },
+  { label: t('status.completed'), value: 'completed' },
+])
 
 const selectedStatus = computed({
   get: () => filter.status || 'all',
@@ -107,16 +106,16 @@ const resetFilters = () => {
 }
 
 // ── Table ───────────────────────────────────────────
-const columns = [
-  { accessorKey: 'id', header: '#' },
-  { accessorKey: 'customerName', header: 'ชื่อลูกค้า' },
-  { accessorKey: 'phoneNumber', header: 'เบอร์โทร' },
-  { accessorKey: 'deviceModel', header: 'รุ่นมือถือ' },
-  { accessorKey: 'branch', header: 'สาขา' },
-  { accessorKey: 'status', header: 'สถานะ' },
-  { accessorKey: 'prebookingDate', header: 'วันที่จอง' },
+const columns = computed(() => [
+  { accessorKey: 'id', header: t('display.table.col.id') },
+  { accessorKey: 'customerName', header: t('display.table.col.customerName') },
+  { accessorKey: 'phoneNumber', header: t('display.table.col.phone') },
+  { accessorKey: 'deviceModel', header: t('display.table.col.device') },
+  { accessorKey: 'branch', header: t('display.table.col.branch') },
+  { accessorKey: 'status', header: t('display.table.col.status') },
+  { accessorKey: 'prebookingDate', header: t('display.table.col.date') },
   { id: 'actions', header: '' },
-]
+])
 
 const mockData = ref([
   { id: '1', customerName: 'สมชาย มานะ', phoneNumber: '089-xxx-xxxx', deviceModel: 'iPhone 16 Pro', branch: 'สาขากลาง', status: 'confirmed' as PrebookingStatus, prebookingDate: '2026-03-15' },
@@ -135,12 +134,12 @@ const statusColorMap: Record<PrebookingStatus, BadgeColor> = {
   completed: 'info',
 }
 
-const statusLabelMap: Record<PrebookingStatus, string> = {
-  pending: 'รอดำเนินการ',
-  confirmed: 'ยืนยันแล้ว',
-  cancelled: 'ยกเลิก',
-  completed: 'เสร็จสิ้น',
-}
+const statusLabelMap = computed((): Record<PrebookingStatus, string> => ({
+  pending: t('status.pending'),
+  confirmed: t('status.confirmed'),
+  cancelled: t('status.cancelled'),
+  completed: t('status.completed'),
+}))
 
 // ── Detail Slideover ────────────────────────────────
 const selectedItem = ref<typeof mockData.value[0] | null>(null)
@@ -158,14 +157,14 @@ const openDetail = (item: typeof mockData.value[0]) => {
     <div class="flex items-start justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Prebooking Dashboard
+          {{ t('display.title') }}
         </h1>
         <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          ข้อมูล ณ วันที่ 9 มีนาคม 2026 · อัปเดตอัตโนมัติทุก 5 นาที
+          {{ t('display.updated') }}
         </p>
       </div>
       <UButton icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" class="shrink-0">
-        รีเฟรช
+        {{ t('display.refresh') }}
       </UButton>
     </div>
 
@@ -221,35 +220,35 @@ const openDetail = (item: typeof mockData.value[0]) => {
       <!-- Header -->
       <div class="flex items-center gap-2.5 border-b border-slate-100 bg-slate-50/70 px-5 py-3 dark:border-white/[0.05] dark:bg-white/[0.02]">
         <UIcon name="i-lucide-sliders-horizontal" class="size-4 text-slate-400 dark:text-slate-500" />
-        <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">ตัวกรองข้อมูล</p>
+        <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ t('display.filter.title') }}</p>
         <span
           v-if="hasActiveFilters"
           class="ml-auto inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-400"
         >
           <span class="size-1.5 rounded-full bg-red-600" />
-          กรองอยู่
+          {{ t('display.filter.active') }}
         </span>
       </div>
 
       <div class="p-4">
         <div class="flex flex-wrap items-end gap-3">
-          <UFormField label="ค้นหา" class="min-w-52 flex-1">
+          <UFormField :label="t('display.filter.search')" class="min-w-52 flex-1">
             <UInput
               v-model="filter.search"
               icon="i-lucide-search"
-              placeholder="ชื่อลูกค้า, เบอร์โทร, รุ่นมือถือ..."
+              :placeholder="t('display.filter.searchPlaceholder')"
             />
           </UFormField>
 
-          <UFormField label="สถานะ">
+          <UFormField :label="t('display.filter.status')">
             <USelect v-model="selectedStatus" :items="statusOptions" class="w-40" />
           </UFormField>
 
-          <UFormField label="จากวันที่">
+          <UFormField :label="t('display.filter.dateFrom')">
             <UInput v-model="filter.dateFrom" type="date" class="w-38" />
           </UFormField>
 
-          <UFormField label="ถึงวันที่">
+          <UFormField :label="t('display.filter.dateTo')">
             <UInput v-model="filter.dateTo" type="date" class="w-38" />
           </UFormField>
 
@@ -261,7 +260,7 @@ const openDetail = (item: typeof mockData.value[0]) => {
             class="text-slate-500 hover:text-slate-900 disabled:opacity-40 dark:hover:text-white"
             @click="resetFilters"
           >
-            ล้าง
+            {{ t('display.filter.reset') }}
           </UButton>
         </div>
       </div>
@@ -273,11 +272,11 @@ const openDetail = (item: typeof mockData.value[0]) => {
       <div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-5 py-3.5 dark:border-white/[0.05] dark:bg-white/[0.02]">
         <div class="flex items-center gap-2.5">
           <div class="size-2 rounded-full bg-red-600" style="box-shadow:0 0 6px 2px rgba(224,0,0,0.5)" />
-          <p class="text-sm font-semibold text-slate-900 dark:text-white">รายการ Prebooking</p>
+          <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ t('display.table.title') }}</p>
         </div>
         <div class="flex items-center gap-2">
           <UBadge color="neutral" variant="subtle" size="sm">
-            500 รายการ
+            500 {{ t('display.table.items') }}
           </UBadge>
           <UButton icon="i-lucide-download" color="neutral" variant="ghost" size="xs">
             Export
@@ -327,14 +326,14 @@ const openDetail = (item: typeof mockData.value[0]) => {
       <!-- Pagination -->
       <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-3.5 dark:border-white/[0.05] dark:bg-white/[0.02]">
         <p class="text-xs text-slate-400 dark:text-slate-500">
-          แสดง {{ (filter.page - 1) * filter.limit + 1 }}–{{ Math.min(filter.page * filter.limit, 500) }} จาก 500 รายการ
+          {{ t('display.table.showing') }} {{ (filter.page - 1) * filter.limit + 1 }}–{{ Math.min(filter.page * filter.limit, 500) }} {{ t('display.table.from') }} 500 {{ t('display.table.items') }}
         </p>
         <UPagination v-model="filter.page" :total="500" :items-per-page="filter.limit" />
       </div>
     </div>
 
     <!-- ─── Detail Slideover ───────────────────────────── -->
-    <USlideover v-model:open="isDetailOpen" title="รายละเอียด Prebooking">
+    <USlideover v-model:open="isDetailOpen" :title="t('display.detail.title')">
       <template v-if="selectedItem">
         <div class="space-y-5 p-6">
           <!-- Status + ID -->
@@ -359,15 +358,15 @@ const openDetail = (item: typeof mockData.value[0]) => {
           <!-- Detail grid -->
           <div class="grid grid-cols-2 gap-3">
             <div class="rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">รุ่นมือถือ</p>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('display.detail.device') }}</p>
               <p class="mt-1.5 font-semibold text-slate-900 dark:text-white">{{ selectedItem.deviceModel }}</p>
             </div>
             <div class="rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">สาขา</p>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('display.detail.branch') }}</p>
               <p class="mt-1.5 font-semibold text-slate-900 dark:text-white">{{ selectedItem.branch }}</p>
             </div>
             <div class="col-span-2 rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">วันที่จอง</p>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('display.detail.date') }}</p>
               <p class="mt-1.5 font-mono font-semibold text-slate-900 dark:text-white">{{ selectedItem.prebookingDate }}</p>
             </div>
           </div>

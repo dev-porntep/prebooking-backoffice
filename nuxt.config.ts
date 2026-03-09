@@ -11,6 +11,16 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@pinia/nuxt',
     'nuxt-auth-utils',
+    ['@nuxtjs/i18n', {
+      locales: [
+        { code: 'th', name: 'ไทย', file: 'th.json' },
+        { code: 'en', name: 'English', file: 'en.json' },
+      ],
+      defaultLocale: 'th',
+      langDir: 'locales/',
+      strategy: 'no_prefix',
+      detectBrowserLanguage: false,
+    }],
   ],
 
   // Use cookie-based storage so SSR and client agree on initial color mode

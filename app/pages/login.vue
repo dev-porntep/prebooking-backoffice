@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+
 definePageMeta({
   layout: 'auth',
   title: 'Login',
@@ -26,16 +28,16 @@ const handleSSOLogin = async () => {
         <UIcon name="i-lucide-smartphone" class="size-5 text-white" />
       </div>
       <div>
-        <p class="font-bold text-slate-900 dark:text-white leading-none">Prebooking</p>
-        <p class="mt-0.5 text-[10px] uppercase tracking-wider text-slate-400">Back Office</p>
+        <p class="font-bold text-slate-900 dark:text-white leading-none">{{ t('app.name') }}</p>
+        <p class="mt-0.5 text-[10px] uppercase tracking-wider text-slate-400">{{ t('app.subtitle') }}</p>
       </div>
     </div>
 
     <!-- ─── Heading ────────────────────────────────────── -->
     <div>
-      <h1 class="text-2xl font-bold text-slate-900 dark:text-white">เข้าสู่ระบบ</h1>
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ t('login.title') }}</h1>
       <p class="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
-        ใช้บัญชี SSO ขององค์กรเพื่อเข้าสู่ระบบ
+        {{ t('login.desc') }}
       </p>
     </div>
 
@@ -46,23 +48,21 @@ const handleSSOLogin = async () => {
         :disabled="isLoading"
         @click="handleSSOLogin"
       >
-        <!-- Shimmer sweep -->
         <div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/12 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-
         <span v-if="isLoading" class="relative flex items-center gap-2">
           <UIcon name="i-lucide-loader-2" class="size-4 animate-spin" />
-          กำลังเข้าสู่ระบบ...
+          {{ t('login.loading') }}
         </span>
         <span v-else class="relative flex items-center gap-2">
           <UIcon name="i-lucide-shield-check" class="size-4" />
-          เข้าสู่ระบบด้วย SSO
+          {{ t('login.sso') }}
         </span>
       </button>
 
       <!-- Divider -->
       <div class="flex items-center gap-3">
         <div class="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-        <span class="text-xs text-slate-400">หรือ</span>
+        <span class="text-xs text-slate-400">{{ t('login.or') }}</span>
         <div class="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
       </div>
 
@@ -73,9 +73,9 @@ const handleSSOLogin = async () => {
             <UIcon name="i-lucide-headphones" class="size-4 text-amber-500" />
           </div>
           <div>
-            <p class="text-xs font-semibold text-slate-900 dark:text-white">ต้องการความช่วยเหลือ?</p>
+            <p class="text-xs font-semibold text-slate-900 dark:text-white">{{ t('login.help.title') }}</p>
             <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-              ติดต่อ IT Support หากมีปัญหาในการเข้าสู่ระบบ
+              {{ t('login.help.desc') }}
             </p>
           </div>
         </div>
@@ -84,7 +84,7 @@ const handleSSOLogin = async () => {
 
     <!-- ─── Footer note ────────────────────────────────── -->
     <p class="text-center text-xs text-slate-400">
-      ระบบนี้สำหรับพนักงานที่ได้รับอนุญาตเท่านั้น
+      {{ t('login.footer') }}
     </p>
   </div>
 </template>
