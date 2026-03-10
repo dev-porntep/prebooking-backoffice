@@ -6,7 +6,13 @@
   "nav": {
     "menu": "MAIN MENU",
     "dashboard": { "label": "Dashboard", "sublabel": "View Prebooking Data" },
-    "import": { "label": "Import Excel", "sublabel": "Import Data" },
+    "import": {
+      "label": "Import Excel",
+      "sublabel": "Import Data",
+      "quota": { "label": "Product Quota", "sublabel": "Setup Quota by Mat Code" },
+      "dates": { "label": "Booking Dates", "sublabel": "Prebooking → Pickup Date Map" },
+      "timeslots": { "label": "Pickup Time Slots", "sublabel": "Available pickup hours" }
+    },
     "export": { "label": "Export Excel", "sublabel": "Export Data" }
   },
   "system": {

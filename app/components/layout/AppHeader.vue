@@ -1,18 +1,60 @@
 <script setup lang="ts">
+const emit = defineEmits(['toggle-sidebar'])
 const { t } = useI18n()
 const colorMode = useColorMode()
-const emit = defineEmits(['toggle-sidebar'])
+// จัดการสถานะการเลือกธีม (เก็บใน Cookie)
+const themeSetting = useCookie<'light' | 'dark' | 'auto'>('theme-setting', { default: () => 'light' })
 
-const toggleColorMode = () => {
-  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+// ฟังก์ชันอัปเดตธีม (Theme) อัตโนมัติตามเวลาประเทศไทย
+const updateThemeBasedOnThaiTime = () => {
+  if (themeSetting.value !== 'auto') return
+  
+  const now = new Date()
+  const utcHours = now.getUTCHours()
+  const thaiHours = (utcHours + 7) % 24
+  
+  // กลางวัน: 06:00 - 17:59, กลางคืน: 18:00 - 05:59
+  const isDayTime = thaiHours >= 6 && thaiHours < 18
+  colorMode.preference = isDayTime ? 'light' : 'dark'
 }
 
-// Mock user — จะเปลี่ยนเป็น useUserSession() ตอนต่อ SSO จริง
-const user = ref({
-  name: 'Admin User',
-  email: 'admin@company.com',
-  avatar: '',
+let timeInterval: ReturnType<typeof setInterval>
+
+onMounted(() => {
+  // ทำงานครั้งแรกเมื่อ Component โหลดเสร็จบน Client (Client-side)
+  if (themeSetting.value === 'auto') {
+    updateThemeBasedOnThaiTime()
+  } else {
+    colorMode.preference = themeSetting.value
+  }
+  
+  // ตั้งค่า Timer เช็คเวลาทุกๆ 5 นาที
+  timeInterval = setInterval(updateThemeBasedOnThaiTime, 5 * 60 * 1000)
 })
+
+onUnmounted(() => {
+  if (timeInterval) clearInterval(timeInterval)
+})
+
+watch(themeSetting, (newValue) => {
+  if (newValue === 'auto') {
+    updateThemeBasedOnThaiTime()
+  } else {
+    colorMode.preference = newValue
+  }
+})
+
+const themeIcon = computed(() => {
+  if (themeSetting.value === 'light') return 'i-lucide-sun'
+  if (themeSetting.value === 'dark') return 'i-lucide-moon'
+  return 'i-lucide-clock' // ไอคอนสำหรับโหมดอิงเวลา
+})
+
+const { user: sessionUser } = useUserSession()
+const user = computed(() => ({
+  name: (sessionUser.value as { name?: string } | null)?.name ?? 'User',
+  email: (sessionUser.value as { email?: string } | null)?.email ?? '',
+}))
 
 const initials = computed(() => {
   return user.value.name
@@ -29,7 +71,7 @@ const userMenuItems = computed(() => [
     { label: t('user.settings'), icon: 'i-lucide-settings' },
   ],
   [
-    { label: t('user.logout'), icon: 'i-lucide-log-out', click: () => navigateTo('/login') },
+    { label: t('user.logout'), icon: 'i-lucide-log-out', click: () => navigateTo('/auth/logout', { external: true }) },
   ],
 ])
 
@@ -70,14 +112,31 @@ const pageInfo = computed(() => pageTitleMap.value[route.path] ?? { title: Strin
 
       <!-- Dark mode toggle (ClientOnly prevents SSR/client hydration mismatch) -->
       <ClientOnly>
-        <Button
-          variant="ghost"
-          size="sm"
-          class="size-8 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-          @click="toggleColorMode"
-        >
-          <UIcon :name="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'" class="size-4" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button
+              variant="ghost"
+              size="sm"
+              class="size-8 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+            >
+              <UIcon :name="themeIcon" class="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem @click="themeSetting = 'light'">
+              <UIcon name="i-lucide-sun" class="mr-2 size-4" />
+              <span>สว่าง (Light)</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem @click="themeSetting = 'dark'">
+              <UIcon name="i-lucide-moon" class="mr-2 size-4" />
+              <span>มืด (Dark)</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem @click="themeSetting = 'auto'">
+              <UIcon name="i-lucide-clock" class="mr-2 size-4" />
+              <span>อัตโนมัติ (Thai Time)</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <template #fallback>
           <div class="size-8" />
         </template>

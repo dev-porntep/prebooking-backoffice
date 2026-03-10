@@ -15,7 +15,7 @@ const isLoading = ref(false)
 const handleSSOLogin = async () => {
   isLoading.value = true
   try {
-    await navigateTo('/api/auth/sso', { external: true })
+    await navigateTo('/auth/google', { external: true })
   } catch {
     isLoading.value = false
     toast.error(t('toast.login.error'))

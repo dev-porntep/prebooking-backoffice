@@ -6,7 +6,13 @@
   "nav": {
     "menu": "เมนูหลัก",
     "dashboard": { "label": "Dashboard", "sublabel": "ดูข้อมูล Prebooking" },
-    "import": { "label": "Import Excel", "sublabel": "นำเข้าข้อมูล" },
+    "import": {
+      "label": "Import Excel",
+      "sublabel": "นำเข้าข้อมูล",
+      "quota": { "label": "Quota สินค้า", "sublabel": "ตั้งค่า Quota ตาม Mat Code" },
+      "dates": { "label": "ตารางวันจอง-รับ", "sublabel": "วันจอง → วันรับสินค้า" },
+      "timeslots": { "label": "ช่วงเวลารับสินค้า", "sublabel": "เวลาที่สามารถรับเครื่องได้" }
+    },
     "export": { "label": "Export Excel", "sublabel": "ส่งออกข้อมูล" }
   },
   "system": {

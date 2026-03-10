@@ -4,8 +4,7 @@ export default defineEventHandler(async (event) => {
 
   if (!protectedPaths.some(path => url.pathname.startsWith(path))) return
 
-  // TODO: เปลี่ยนเป็น getUserSession(event) ตอนต่อ SSO จริง
-  const session = { user: { id: '1', name: 'Admin' }, accessToken: 'mock-token' }
+  const session = await getUserSession(event)
 
   if (!session?.user) {
     throw createError({ statusCode: 401, message: 'Unauthorized' })
@@ -13,6 +12,6 @@ export default defineEventHandler(async (event) => {
 
   event.context.auth = {
     user: session.user,
-    token: session.accessToken,
+    token: session.accessToken as string | undefined,
   }
 })
