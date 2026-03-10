@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const isSidebarOpen = ref(false)
+const isDesktopCollapsed = ref(false)
 </script>
 
 <template>
@@ -18,17 +19,24 @@ const isSidebarOpen = ref(false)
       />
     </Transition>
 
-    <!-- Sidebar wrapper — slides on mobile, static on desktop -->
+    <!-- Sidebar wrapper — slides on mobile, collapsible on desktop -->
     <div
-      class="fixed inset-y-0 left-0 z-40 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0"
-      :class="isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+      class="fixed inset-y-0 left-0 z-40 shrink-0 overflow-hidden transition-all duration-300 ease-in-out lg:static"
+      :class="[
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        isDesktopCollapsed ? 'lg:w-0' : 'lg:w-64',
+      ]"
     >
       <LayoutAppSidebar @close="isSidebarOpen = false" />
     </div>
 
     <!-- Main area -->
     <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-      <LayoutAppHeader @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+      <LayoutAppHeader
+        :desktop-collapsed="isDesktopCollapsed"
+        @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
+        @toggle-desktop-sidebar="isDesktopCollapsed = !isDesktopCollapsed"
+      />
 
       <main class="flex-1 overflow-y-auto scroll-smooth">
         <!-- Subtle dot-grid background -->
@@ -38,6 +46,7 @@ const isSidebarOpen = ref(false)
         />
         <div class="relative z-10 mx-auto max-w-7xl p-4 sm:p-6">
           <LayoutAppBreadcrumb class="mb-5" />
+
           <slot />
         </div>
       </main>

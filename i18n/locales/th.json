@@ -39,6 +39,34 @@
     "title": "Prebooking Dashboard",
     "updated": "ข้อมูล ณ วันที่ 9 มีนาคม 2026 · อัปเดตอัตโนมัติทุก 5 นาที",
     "refresh": "รีเฟรช",
+    "greeting": "สวัสดี",
+    "systemTitle": "ระบบจัดการ Prebooking Back Office",
+    "systemOnline": "ระบบออนไลน์",
+    "todayLabel": "วันที่วันนี้",
+    "quickActionsLabel": "เมนูด่วน",
+    "openPage": "เปิดหน้านี้",
+    "capabilitiesTitle": "ความสามารถของระบบ",
+    "limitationsTitle": "ข้อจำกัดของระบบ",
+    "actions": {
+      "quota": { "title": "Quota สินค้า", "desc": "ตั้งค่า Quota ตาม Mat Code/SKU แยก Normal/Special", "tag": "Import" },
+      "dates": { "title": "ตารางวันจอง-รับ", "desc": "Mapping วันจอง Prebooking ไปยังวันรับสินค้า", "tag": "Import" },
+      "timeslots": { "title": "ช่วงเวลารับสินค้า", "desc": "กำหนด Time Slots สำหรับการรับเครื่อง", "tag": "Import" },
+      "export": { "title": "Export ข้อมูล", "desc": "ส่งออกข้อมูล Prebooking เป็นไฟล์ Excel", "tag": "Export" }
+    },
+    "capabilities": {
+      "quota": { "title": "นำเข้า Quota สินค้า", "desc": "ตั้งค่า Quota ตาม Mat Code/SKU แยกประเภท Normal และ Special พร้อมกำหนดวันเริ่ม-สิ้นสุดการจอง" },
+      "dates": { "title": "ตั้งค่าตารางวันจอง → รับสินค้า", "desc": "Mapping วันจอง Prebooking ไปยังวันรับสินค้า คำนวณข้ามวันหยุดนักขัตฤกษ์อัตโนมัติ" },
+      "timeslots": { "title": "ตั้งค่าช่วงเวลารับสินค้า", "desc": "กำหนด Time Slots สำหรับการรับเครื่อง เช่น 11:00–13:00 และ 16:00–19:00" },
+      "export": { "title": "Export ข้อมูล Prebooking", "desc": "ส่งออกข้อมูลเป็นไฟล์ Excel พร้อม filter เงื่อนไขตามวันที่ สถานะ และสาขา" }
+    },
+    "limitations": {
+      "fileSize": { "label": "ขนาดไฟล์สูงสุด", "value": "50 MB ต่อไฟล์" },
+      "rows": { "label": "จำนวน Rows สูงสุด", "value": "100,000 แถวต่อไฟล์" },
+      "chunk": { "label": "ขนาด Chunk", "value": "500 แถวต่อ batch" },
+      "fileType": { "label": "ประเภทไฟล์", "value": ".xlsx และ .xls เท่านั้น" },
+      "dashboard": { "label": "Dashboard", "value": "อยู่ระหว่างพัฒนา" },
+      "auth": { "label": "Authentication", "value": "ต้องตั้งค่า SSO ก่อนใช้งานจริง" }
+    },
     "stats": {
       "total": "ทั้งหมด",
       "pending": "รอดำเนินการ",
@@ -81,6 +109,47 @@
     "title": "Import Prebooking Data",
     "subtitle": "นำเข้าข้อมูลจากไฟล์ Excel (.xlsx, .xls)",
     "downloadTemplate": "ดาวน์โหลด Template",
+    "quota": {
+      "title": "Import Quota สินค้า",
+      "subtitle": "นำเข้าข้อมูล Quota ตาม Mat Code จากไฟล์ Excel",
+      "downloadTemplate": "ดาวน์โหลด Template Quota",
+      "preview": {
+        "col": {
+          "matCode": "Mat Code",
+          "productName": "ชื่อสินค้า",
+          "color": "สี",
+          "storage": "ความจุ",
+          "branchCode": "รหัสสาขา",
+          "quota": "Quota"
+        }
+      }
+    },
+    "dates": {
+      "title": "Import ตารางวันจอง-รับ",
+      "subtitle": "นำเข้าตารางวันจอง → วันรับสินค้า จากไฟล์ Excel",
+      "downloadTemplate": "ดาวน์โหลด Template วันจอง-รับ",
+      "preview": {
+        "col": {
+          "prebookingDate": "วันที่จอง",
+          "pickupDate": "วันที่รับ",
+          "branchCode": "รหัสสาขา"
+        }
+      }
+    },
+    "timeslots": {
+      "title": "Import ช่วงเวลารับสินค้า",
+      "subtitle": "นำเข้าช่วงเวลาที่สามารถรับเครื่องได้ จากไฟล์ Excel",
+      "downloadTemplate": "ดาวน์โหลด Template ช่วงเวลา",
+      "preview": {
+        "col": {
+          "branchCode": "รหัสสาขา",
+          "date": "วันที่",
+          "startTime": "เวลาเริ่ม",
+          "endTime": "เวลาสิ้นสุด",
+          "capacity": "รองรับ (คน)"
+        }
+      }
+    },
     "steps": {
       "upload": "อัปโหลดไฟล์",
       "preview": "ตรวจสอบ",

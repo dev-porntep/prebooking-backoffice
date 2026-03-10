@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const emit = defineEmits(['toggle-sidebar'])
+defineProps<{ desktopCollapsed?: boolean }>()
+const emit = defineEmits(['toggle-sidebar', 'toggle-desktop-sidebar'])
 const { t } = useI18n()
 const colorMode = useColorMode()
 // จัดการสถานะการเลือกธีม (เก็บใน Cookie)
@@ -66,18 +67,14 @@ const initials = computed(() => {
 })
 
 const userMenuItems = computed(() => [
-  [
-    { label: t('user.profile'), icon: 'i-lucide-user' },
-    { label: t('user.settings'), icon: 'i-lucide-settings' },
-  ],
-  [
-    { label: t('user.logout'), icon: 'i-lucide-log-out', click: () => navigateTo('/auth/logout', { external: true }) },
-  ],
+  { label: t('user.logout'), icon: 'i-lucide-log-out', click: () => navigateTo('/auth/logout', { external: true }) },
 ])
 
 const pageTitleMap = computed((): Record<string, { title: string; subtitle: string }> => ({
   '/': { title: t('pages.home.title'), subtitle: t('pages.home.subtitle') },
-  '/import': { title: t('pages.import.title'), subtitle: t('pages.import.subtitle') },
+  '/import/quota': { title: t('import.quota.title'), subtitle: t('import.quota.subtitle') },
+  '/import/dates': { title: t('import.dates.title'), subtitle: t('import.dates.subtitle') },
+  '/import/timeslots': { title: t('import.timeslots.title'), subtitle: t('import.timeslots.subtitle') },
   '/export': { title: t('pages.export.title'), subtitle: t('pages.export.subtitle') },
 }))
 
@@ -93,6 +90,14 @@ const pageInfo = computed(() => pageTitleMap.value[route.path] ?? { title: Strin
       @click="emit('toggle-sidebar')"
     >
       <UIcon name="i-lucide-menu" class="size-5" />
+    </button>
+
+    <!-- Desktop sidebar toggle -->
+    <button
+      class="hidden size-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white lg:flex"
+      @click="emit('toggle-desktop-sidebar')"
+    >
+      <UIcon :name="desktopCollapsed ? 'i-lucide-panel-left-open' : 'i-lucide-panel-left-close'" class="size-5" />
     </button>
 
     <!-- Page title (left) -->
@@ -174,12 +179,7 @@ const pageInfo = computed(() => pageTitleMap.value[route.path] ?? { title: Strin
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem v-for="item in userMenuItems[0]" :key="item.label" @click="'click' in item ? (item as any).click() : undefined">
-            <UIcon :name="item.icon" class="mr-2 size-4" />
-            <span>{{ item.label }}</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem v-for="item in userMenuItems[1]" :key="item.label" @click="'click' in item ? (item as any).click() : undefined">
+          <DropdownMenuItem v-for="item in userMenuItems" :key="item.label" @click="item.click()">
             <UIcon :name="item.icon" class="mr-2 size-4 text-red-500" />
             <span class="text-red-500">{{ item.label }}</span>
           </DropdownMenuItem>

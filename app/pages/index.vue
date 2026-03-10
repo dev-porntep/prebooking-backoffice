@@ -1,21 +1,25 @@
 <script setup lang="ts">
+const { t, locale } = useI18n()
+
 definePageMeta({ title: 'Home' })
 useHead({ title: 'Prebooking Back Office' })
 
 const { user: sessionUser } = useUserSession()
 const userName = computed(() => (sessionUser.value as { name?: string } | null)?.name ?? 'Admin')
 
-const today = new Date().toLocaleDateString('th-TH', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-})
+const today = computed(() =>
+  new Date().toLocaleDateString(locale.value === 'th' ? 'th-TH' : 'en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }),
+)
 
-const quickActions = [
+const quickActions = computed(() => [
   {
-    title: 'Quota สินค้า',
-    desc: 'ตั้งค่า Quota ตาม Mat Code/SKU แยก Normal/Special',
+    title: t('home.actions.quota.title'),
+    desc: t('home.actions.quota.desc'),
     icon: 'i-lucide-package',
     to: '/import/quota',
     from: 'from-red-500',
@@ -23,11 +27,11 @@ const quickActions = [
     glow: 'shadow-red-500/20',
     ring: 'ring-red-500/20',
     badge: 'bg-red-500/10 text-red-400',
-    tag: 'Import',
+    tag: t('home.actions.quota.tag'),
   },
   {
-    title: 'ตารางวันจอง-รับ',
-    desc: 'Mapping วันจอง Prebooking ไปยังวันรับสินค้า',
+    title: t('home.actions.dates.title'),
+    desc: t('home.actions.dates.desc'),
     icon: 'i-lucide-calendar-days',
     to: '/import/dates',
     from: 'from-sky-500',
@@ -35,11 +39,11 @@ const quickActions = [
     glow: 'shadow-sky-500/20',
     ring: 'ring-sky-500/20',
     badge: 'bg-sky-500/10 text-sky-400',
-    tag: 'Import',
+    tag: t('home.actions.dates.tag'),
   },
   {
-    title: 'ช่วงเวลารับสินค้า',
-    desc: 'กำหนด Time Slots สำหรับการรับเครื่อง',
+    title: t('home.actions.timeslots.title'),
+    desc: t('home.actions.timeslots.desc'),
     icon: 'i-lucide-clock',
     to: '/import/timeslots',
     from: 'from-violet-500',
@@ -47,11 +51,11 @@ const quickActions = [
     glow: 'shadow-violet-500/20',
     ring: 'ring-violet-500/20',
     badge: 'bg-violet-500/10 text-violet-400',
-    tag: 'Import',
+    tag: t('home.actions.timeslots.tag'),
   },
   {
-    title: 'Export ข้อมูล',
-    desc: 'ส่งออกข้อมูล Prebooking เป็นไฟล์ Excel',
+    title: t('home.actions.export.title'),
+    desc: t('home.actions.export.desc'),
     icon: 'i-lucide-download',
     to: '/export',
     from: 'from-emerald-500',
@@ -59,49 +63,49 @@ const quickActions = [
     glow: 'shadow-emerald-500/20',
     ring: 'ring-emerald-500/20',
     badge: 'bg-emerald-500/10 text-emerald-400',
-    tag: 'Export',
+    tag: t('home.actions.export.tag'),
   },
-]
+])
 
-const capabilities = [
+const capabilities = computed(() => [
   {
     icon: 'i-lucide-package',
-    title: 'นำเข้า Quota สินค้า',
-    desc: 'ตั้งค่า Quota ตาม Mat Code/SKU แยกประเภท Normal และ Special พร้อมกำหนดวันเริ่ม-สิ้นสุดการจอง',
+    title: t('home.capabilities.quota.title'),
+    desc: t('home.capabilities.quota.desc'),
     color: 'text-red-500 dark:text-red-400',
     bg: 'bg-red-50 dark:bg-red-500/10',
   },
   {
     icon: 'i-lucide-calendar-days',
-    title: 'ตั้งค่าตารางวันจอง → รับสินค้า',
-    desc: 'Mapping วันจอง Prebooking ไปยังวันรับสินค้า คำนวณข้ามวันหยุดนักขัตฤกษ์อัตโนมัติ',
+    title: t('home.capabilities.dates.title'),
+    desc: t('home.capabilities.dates.desc'),
     color: 'text-sky-500 dark:text-sky-400',
     bg: 'bg-sky-50 dark:bg-sky-500/10',
   },
   {
     icon: 'i-lucide-clock',
-    title: 'ตั้งค่าช่วงเวลารับสินค้า',
-    desc: 'กำหนด Time Slots สำหรับการรับเครื่อง เช่น 11:00–13:00 และ 16:00–19:00',
+    title: t('home.capabilities.timeslots.title'),
+    desc: t('home.capabilities.timeslots.desc'),
     color: 'text-violet-500 dark:text-violet-400',
     bg: 'bg-violet-50 dark:bg-violet-500/10',
   },
   {
     icon: 'i-lucide-file-spreadsheet',
-    title: 'Export ข้อมูล Prebooking',
-    desc: 'ส่งออกข้อมูลเป็นไฟล์ Excel พร้อม filter เงื่อนไขตามวันที่ สถานะ และสาขา',
+    title: t('home.capabilities.export.title'),
+    desc: t('home.capabilities.export.desc'),
     color: 'text-emerald-500 dark:text-emerald-400',
     bg: 'bg-emerald-50 dark:bg-emerald-500/10',
   },
-]
+])
 
-const limitations = [
-  { icon: 'i-lucide-hard-drive', label: 'ขนาดไฟล์สูงสุด', value: '50 MB ต่อไฟล์' },
-  { icon: 'i-lucide-rows', label: 'จำนวน Rows สูงสุด', value: '100,000 แถวต่อไฟล์' },
-  { icon: 'i-lucide-layers', label: 'ขนาด Chunk', value: '500 แถวต่อ batch' },
-  { icon: 'i-lucide-file-type', label: 'ประเภทไฟล์', value: '.xlsx และ .xls เท่านั้น' },
-  { icon: 'i-lucide-layout-dashboard', label: 'Dashboard', value: 'อยู่ระหว่างพัฒนา' },
-  { icon: 'i-lucide-shield-check', label: 'Authentication', value: 'ต้องตั้งค่า SSO ก่อนใช้งานจริง' },
-]
+const limitations = computed(() => [
+  { icon: 'i-lucide-hard-drive', label: t('home.limitations.fileSize.label'), value: t('home.limitations.fileSize.value') },
+  { icon: 'i-lucide-rows', label: t('home.limitations.rows.label'), value: t('home.limitations.rows.value') },
+  { icon: 'i-lucide-layers', label: t('home.limitations.chunk.label'), value: t('home.limitations.chunk.value') },
+  { icon: 'i-lucide-file-type', label: t('home.limitations.fileType.label'), value: t('home.limitations.fileType.value') },
+  { icon: 'i-lucide-layout-dashboard', label: t('home.limitations.dashboard.label'), value: t('home.limitations.dashboard.value') },
+  { icon: 'i-lucide-shield-check', label: t('home.limitations.auth.label'), value: t('home.limitations.auth.value') },
+])
 
 const techStack = [
   { label: 'nuxt-auth-utils', value: 'v0.5.29' },
@@ -115,34 +119,31 @@ const techStack = [
 
     <!-- ─── Hero ──────────────────────────────────────────── -->
     <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 shadow-xl dark:from-[#0C1220] dark:via-[#101828] dark:to-[#0C1220]">
-      <!-- Dot grid texture -->
       <div
         class="pointer-events-none absolute inset-0 opacity-[0.06]"
         style="background-image: radial-gradient(circle at 1.5px 1.5px, white 1px, transparent 0); background-size: 28px 28px;"
       />
-      <!-- Red glow blob -->
       <div class="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-red-600/20 blur-3xl" />
       <div class="pointer-events-none absolute -bottom-16 left-1/3 size-56 rounded-full bg-rose-700/10 blur-3xl" />
 
       <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div class="space-y-2">
-          <!-- Online badge -->
           <div class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
             <span class="relative flex size-1.5">
               <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span class="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
             </span>
-            ระบบออนไลน์
+            {{ t('home.systemOnline') }}
           </div>
 
           <h1 class="text-3xl font-bold text-white">
-            สวัสดี, <span class="bg-gradient-to-r from-red-400 to-rose-400 bg-clip-text text-transparent">{{ userName }}</span>
+            {{ t('home.greeting') }}, <span class="bg-gradient-to-r from-red-400 to-rose-400 bg-clip-text text-transparent">{{ userName }}</span>
           </h1>
-          <p class="text-sm text-slate-400">ระบบจัดการ Prebooking Back Office</p>
+          <p class="text-sm text-slate-400">{{ t('home.systemTitle') }}</p>
         </div>
 
         <div class="shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.04] px-5 py-3.5 backdrop-blur-sm">
-          <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">วันที่วันนี้</p>
+          <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">{{ t('home.todayLabel') }}</p>
           <p class="mt-1 text-sm font-medium text-slate-200">{{ today }}</p>
         </div>
       </div>
@@ -152,7 +153,7 @@ const techStack = [
     <section class="space-y-4">
       <div class="flex items-center gap-2.5">
         <div class="h-px flex-1 bg-slate-200 dark:bg-white/[0.06]" />
-        <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400">เมนูด่วน</p>
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400">{{ t('home.quickActionsLabel') }}</p>
         <div class="h-px flex-1 bg-slate-200 dark:bg-white/[0.06]" />
       </div>
 
@@ -164,11 +165,9 @@ const techStack = [
           :class="'hover:' + action.glow + ' hover:ring-1 hover:' + action.ring"
           @click="navigateTo(action.to)"
         >
-          <!-- Top gradient line -->
           <div :class="['h-0.5 w-full bg-gradient-to-r', action.from, action.to_color]" />
 
           <div class="p-5">
-            <!-- Icon + tag row -->
             <div class="flex items-start justify-between">
               <div :class="['flex size-10 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md', action.from, action.to_color]">
                 <UIcon :name="action.icon" class="size-5" />
@@ -183,9 +182,8 @@ const techStack = [
               <p class="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{{ action.desc }}</p>
             </div>
 
-            <!-- Arrow -->
             <div class="mt-4 flex items-center gap-1 text-xs font-medium text-slate-400 transition-all duration-200 group-hover:gap-2 group-hover:text-slate-600 dark:group-hover:text-slate-200">
-              <span>เปิดหน้านี้</span>
+              <span>{{ t('home.openPage') }}</span>
               <UIcon name="i-lucide-arrow-right" class="size-3.5" />
             </div>
           </div>
@@ -197,10 +195,10 @@ const techStack = [
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
       <!-- Capabilities (2/3 width) -->
-      <section class="lg:col-span-2 space-y-4">
+      <section class="space-y-4 lg:col-span-2">
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-sparkles" class="size-4 text-red-500" />
-          <h2 class="text-sm font-semibold text-slate-900 dark:text-white">ความสามารถของระบบ</h2>
+          <h2 class="text-sm font-semibold text-slate-900 dark:text-white">{{ t('home.capabilitiesTitle') }}</h2>
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -226,7 +224,7 @@ const techStack = [
       <section class="space-y-4">
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-triangle-alert" class="size-4 text-amber-500" />
-          <h2 class="text-sm font-semibold text-slate-900 dark:text-white">ข้อจำกัดของระบบ</h2>
+          <h2 class="text-sm font-semibold text-slate-900 dark:text-white">{{ t('home.limitationsTitle') }}</h2>
         </div>
 
         <div class="rounded-xl border border-amber-200/60 bg-amber-50/50 dark:border-amber-500/10 dark:bg-amber-500/5">

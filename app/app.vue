@@ -35,8 +35,9 @@ useSeoMeta({
 </script>
 
 <template>
+  <NuxtLoadingIndicator color="#E2231A" :height="2" :duration="1500" :throttle="100" />
   <NuxtLayout>
-    <NuxtPage />
+    <NuxtPage :transition="{ name: 'page', mode: 'out-in' }" />
   </NuxtLayout>
   <Toaster />
 </template>
@@ -54,6 +55,21 @@ body {
 
 code, pre, .font-mono {
   font-family: 'JetBrains Mono', monospace;
+}
+
+.page-enter-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.page-leave-active {
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
 ::selection {

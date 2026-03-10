@@ -39,6 +39,34 @@
     "title": "Prebooking Dashboard",
     "updated": "Data as of March 9, 2026 · Auto-updated every 5 minutes",
     "refresh": "Refresh",
+    "greeting": "Hello",
+    "systemTitle": "Prebooking Back Office Management System",
+    "systemOnline": "System Online",
+    "todayLabel": "Today",
+    "quickActionsLabel": "Quick Actions",
+    "openPage": "Open page",
+    "capabilitiesTitle": "System Capabilities",
+    "limitationsTitle": "System Limitations",
+    "actions": {
+      "quota": { "title": "Product Quota", "desc": "Setup quota by Mat Code/SKU for Normal/Special types", "tag": "Import" },
+      "dates": { "title": "Booking Dates", "desc": "Map prebooking dates to product pickup dates", "tag": "Import" },
+      "timeslots": { "title": "Pickup Time Slots", "desc": "Define time slots for product pickup", "tag": "Import" },
+      "export": { "title": "Export Data", "desc": "Export Prebooking data to Excel file", "tag": "Export" }
+    },
+    "capabilities": {
+      "quota": { "title": "Import Product Quota", "desc": "Setup quota by Mat Code/SKU for Normal and Special types with booking start/end dates" },
+      "dates": { "title": "Setup Booking → Pickup Date Map", "desc": "Map prebooking dates to pickup dates, auto-calculate across public holidays" },
+      "timeslots": { "title": "Setup Pickup Time Slots", "desc": "Define time slots for product pickup, e.g. 11:00–13:00 and 16:00–19:00" },
+      "export": { "title": "Export Prebooking Data", "desc": "Export data to Excel with filters by date, status, and branch" }
+    },
+    "limitations": {
+      "fileSize": { "label": "Max File Size", "value": "50 MB per file" },
+      "rows": { "label": "Max Rows", "value": "100,000 rows per file" },
+      "chunk": { "label": "Chunk Size", "value": "500 rows per batch" },
+      "fileType": { "label": "File Types", "value": ".xlsx and .xls only" },
+      "dashboard": { "label": "Dashboard", "value": "Under development" },
+      "auth": { "label": "Authentication", "value": "SSO must be configured before use" }
+    },
     "stats": {
       "total": "Total",
       "pending": "Pending",
@@ -81,6 +109,47 @@
     "title": "Import Prebooking Data",
     "subtitle": "Import data from Excel file (.xlsx, .xls)",
     "downloadTemplate": "Download Template",
+    "quota": {
+      "title": "Import Product Quota",
+      "subtitle": "Import product quota by Mat Code from Excel file",
+      "downloadTemplate": "Download Quota Template",
+      "preview": {
+        "col": {
+          "matCode": "Mat Code",
+          "productName": "Product Name",
+          "color": "Color",
+          "storage": "Storage",
+          "branchCode": "Branch Code",
+          "quota": "Quota"
+        }
+      }
+    },
+    "dates": {
+      "title": "Import Booking Dates",
+      "subtitle": "Import prebooking → pickup date mapping from Excel file",
+      "downloadTemplate": "Download Dates Template",
+      "preview": {
+        "col": {
+          "prebookingDate": "Prebooking Date",
+          "pickupDate": "Pickup Date",
+          "branchCode": "Branch Code"
+        }
+      }
+    },
+    "timeslots": {
+      "title": "Import Pickup Time Slots",
+      "subtitle": "Import available pickup time slots from Excel file",
+      "downloadTemplate": "Download Timeslots Template",
+      "preview": {
+        "col": {
+          "branchCode": "Branch Code",
+          "date": "Date",
+          "startTime": "Start Time",
+          "endTime": "End Time",
+          "capacity": "Capacity"
+        }
+      }
+    },
     "steps": {
       "upload": "Upload File",
       "preview": "Preview",
