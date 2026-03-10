@@ -74,6 +74,7 @@ export default defineNuxtConfig({
     public: {
       appName: 'Prebooking Back Office',
       maxUploadSize: 50,
+      authEnabled: process.env['NUXT_PUBLIC_AUTH_ENABLED'] !== 'false',
     },
   },
 
