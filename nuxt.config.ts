@@ -1,4 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { fileURLToPath, URL } from 'node:url'
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
 
@@ -10,8 +13,24 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  alias: {
+    '@': fileURLToPath(new URL('./app', import.meta.url)),
+  },
+
+  components: {
+    dirs: [
+      {
+        path: '~/components/ui',
+        extensions: ['.vue'],
+        pathPrefix: false,
+      },
+      '~/components',
+    ],
+  },
+
   modules: [
-    '@nuxt/ui',
+    '@nuxtjs/color-mode',
+    ['@nuxt/icon', { componentName: 'UIcon' }],
     '@nuxt/eslint',
     '@pinia/nuxt',
     'nuxt-auth-utils',
@@ -72,5 +91,11 @@ export default defineNuxtConfig({
       tasks: true,
       asyncContext: true,
     },
+  },
+
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
   },
 })

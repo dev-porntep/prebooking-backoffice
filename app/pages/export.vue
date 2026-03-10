@@ -144,35 +144,48 @@ const hasFilters = computed(() =>
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <UFormField :label="t('export.dateFrom')">
-            <UInput v-model="exportFilter.dateFrom" type="date" />
-          </UFormField>
-          <UFormField :label="t('export.dateTo')">
-            <UInput v-model="exportFilter.dateTo" type="date" />
-          </UFormField>
-          <UFormField :label="t('export.status')">
-            <USelect v-model="selectedStatus" :items="statusOptions" />
-          </UFormField>
-          <UFormField :label="t('export.device')">
-            <UInput v-model="exportFilter.deviceModel" :placeholder="t('export.devicePlaceholder')" />
-          </UFormField>
-          <UFormField :label="t('export.branch')">
-            <UInput v-model="exportFilter.branch" :placeholder="t('export.branchPlaceholder')" />
-          </UFormField>
+          <div class="space-y-2">
+            <Label>{{ t('export.dateFrom') }}</Label>
+            <Input v-model="exportFilter.dateFrom" type="date" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t('export.dateTo') }}</Label>
+            <Input v-model="exportFilter.dateTo" type="date" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t('export.status') }}</Label>
+            <Select v-model="selectedStatus">
+              <SelectTrigger>
+                <SelectValue :placeholder="t('export.status')" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="item in statusOptions" :key="item.value" :value="item.value">
+                  {{ item.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t('export.device') }}</Label>
+            <Input v-model="exportFilter.deviceModel" :placeholder="t('export.devicePlaceholder')" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t('export.branch') }}</Label>
+            <Input v-model="exportFilter.branch" :placeholder="t('export.branchPlaceholder')" />
+          </div>
         </div>
 
         <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-5 dark:border-white/[0.05]">
-          <UButton
+          <Button
             variant="ghost"
-            color="neutral"
-            icon="i-lucide-rotate-ccw"
             size="sm"
             :disabled="!hasFilters"
             class="disabled:opacity-40"
             @click="resetFilter"
           >
+            <UIcon name="i-lucide-rotate-ccw" class="mr-2 size-4" />
             {{ t('export.reset') }}
-          </UButton>
+          </Button>
           <div class="flex items-center gap-3">
             <p v-if="hasFilters" class="text-xs text-slate-400 dark:text-slate-500">
               <span class="inline-flex items-center gap-1">
@@ -180,9 +193,11 @@ const hasFilters = computed(() =>
                 {{ t('export.activeFilter') }}
               </span>
             </p>
-            <UButton icon="i-lucide-download" size="sm" :loading="isExporting" @click="startExport">
+            <Button size="sm" :disabled="isExporting" @click="startExport">
+              <UIcon v-if="isExporting" name="i-lucide-loader-2" class="mr-2 size-4 animate-spin" />
+              <UIcon v-else name="i-lucide-download" class="mr-2 size-4" />
               {{ t('export.start') }}
-            </UButton>
+            </Button>
           </div>
         </div>
       </div>
@@ -226,39 +241,44 @@ const hasFilters = computed(() =>
             <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{{ t('export.history.subtitle') }}</p>
           </div>
         </div>
-        <UBadge color="neutral" variant="subtle" size="sm">{{ exportHistory.length }} {{ t('export.history.items') }}</UBadge>
+        <Badge variant="secondary">{{ exportHistory.length }} {{ t('export.history.items') }}</Badge>
       </div>
 
-      <UTable :data="exportHistory" :columns="historyColumns">
-        <template #id-cell="{ row }">
-          <span class="font-mono text-xs text-slate-400 dark:text-slate-500">#{{ row.original.id }}</span>
-        </template>
-        <template #createdAt-cell="{ row }">
-          <span class="font-mono text-sm text-slate-600 dark:text-slate-400">{{ row.original.createdAt }}</span>
-        </template>
-        <template #filters-cell="{ row }">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 dark:bg-white/[0.06] dark:text-slate-300">
-            <UIcon name="i-lucide-filter" class="size-3 text-slate-400" />
-            {{ row.original.filters }}
-          </span>
-        </template>
-        <template #totalRows-cell="{ row }">
-          <span class="font-mono text-sm font-semibold text-slate-700 dark:text-slate-300">
-            {{ row.original.totalRows.toLocaleString() }}
-          </span>
-          <span class="ml-1 text-xs text-slate-400">{{ t('export.history.rows') }}</span>
-        </template>
-        <template #actions-cell>
-          <UButton
-            icon="i-lucide-download"
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            :label="t('export.history.download')"
-            @click="handleDownload"
-          />
-        </template>
-      </UTable>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead v-for="col in historyColumns" :key="col.accessorKey || col.id">{{ col.header }}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow v-for="row in exportHistory" :key="row.id">
+            <TableCell>
+              <span class="font-mono text-xs text-slate-400 dark:text-slate-500">#{{ row.id }}</span>
+            </TableCell>
+            <TableCell>
+              <span class="font-mono text-sm text-slate-600 dark:text-slate-400">{{ row.createdAt }}</span>
+            </TableCell>
+            <TableCell>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 dark:bg-white/[0.06] dark:text-slate-300">
+                <UIcon name="i-lucide-filter" class="size-3 text-slate-400" />
+                {{ row.filters }}
+              </span>
+            </TableCell>
+            <TableCell>
+              <span class="font-mono text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {{ row.totalRows.toLocaleString() }}
+              </span>
+              <span class="ml-1 text-xs text-slate-400">{{ t('export.history.rows') }}</span>
+            </TableCell>
+            <TableCell>
+              <Button variant="ghost" size="sm" @click="handleDownload">
+                <UIcon name="i-lucide-download" class="mr-2 size-4" />
+                {{ t('export.history.download') }}
+              </Button>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     </div>
   </div>
 </template>

@@ -182,9 +182,10 @@ const openDetail = (item: RowItem) => {
           {{ t('home.updated') }}
         </p>
       </div>
-      <UButton icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" class="shrink-0" :loading="isLoading" @click="handleRefresh">
+      <Button variant="outline" size="sm" class="shrink-0" :disabled="isLoading" @click="handleRefresh">
+        <UIcon name="i-lucide-refresh-cw" :class="['mr-2 size-4', isLoading && 'animate-spin']" />
         {{ t('home.refresh') }}
-      </UButton>
+      </Button>
     </div>
 
     <!-- ─── Stats grid ─────────────────────────────────── -->
@@ -251,36 +252,49 @@ const openDetail = (item: RowItem) => {
 
       <div class="p-4">
         <div class="flex flex-wrap items-end gap-3">
-          <UFormField :label="t('home.filter.search')" class="min-w-52 flex-1">
-            <UInput
-              v-model="filter.search"
-              icon="i-lucide-search"
-              :placeholder="t('home.filter.searchPlaceholder')"
-            />
-          </UFormField>
+          <div class="space-y-2 min-w-52 flex-1">
+            <Label>{{ t('home.filter.search') }}</Label>
+            <div class="relative w-full items-center">
+              <Input v-model="filter.search" :placeholder="t('home.filter.searchPlaceholder')" class="pl-10" />
+              <span class="absolute start-0 inset-y-0 flex items-center justify-center px-3">
+                <UIcon name="i-lucide-search" class="size-4 text-slate-400" />
+              </span>
+            </div>
+          </div>
 
-          <UFormField :label="t('home.filter.status')">
-            <USelect v-model="selectedStatus" :items="statusOptions" class="w-40" />
-          </UFormField>
+          <div class="space-y-2">
+            <Label>{{ t('home.filter.status') }}</Label>
+            <Select v-model="selectedStatus">
+              <SelectTrigger class="w-40">
+                <SelectValue :placeholder="t('home.filter.status')" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="item in statusOptions" :key="item.value" :value="item.value">
+                  {{ item.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-          <UFormField :label="t('home.filter.dateFrom')">
-            <UInput v-model="filter.dateFrom" type="date" class="w-38" />
-          </UFormField>
+          <div class="space-y-2">
+            <Label>{{ t('home.filter.dateFrom') }}</Label>
+            <Input v-model="filter.dateFrom" type="date" class="w-38" />
+          </div>
 
-          <UFormField :label="t('home.filter.dateTo')">
-            <UInput v-model="filter.dateTo" type="date" class="w-38" />
-          </UFormField>
+          <div class="space-y-2">
+            <Label>{{ t('home.filter.dateTo') }}</Label>
+            <Input v-model="filter.dateTo" type="date" class="w-38" />
+          </div>
 
-          <UButton
+          <Button
             variant="ghost"
-            color="neutral"
-            icon="i-lucide-rotate-ccw"
             :disabled="!hasActiveFilters"
             class="text-slate-500 hover:text-slate-900 disabled:opacity-40 dark:hover:text-white"
             @click="resetFilters"
           >
+            <UIcon name="i-lucide-rotate-ccw" class="mr-2 size-4" />
             {{ t('home.filter.reset') }}
-          </UButton>
+          </Button>
         </div>
       </div>
     </div>
@@ -294,103 +308,132 @@ const openDetail = (item: RowItem) => {
           <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ t('home.table.title') }}</p>
         </div>
         <div class="flex items-center gap-2">
-          <UBadge color="neutral" variant="subtle" size="sm">
+          <Badge variant="secondary">
             {{ total.toLocaleString() }} {{ t('home.table.items') }}
-          </UBadge>
-          <UButton icon="i-lucide-download" color="neutral" variant="ghost" size="xs">
+          </Badge>
+          <Button variant="ghost" size="sm">
+            <UIcon name="i-lucide-download" class="mr-2 size-4" />
             Export
-          </UButton>
+          </Button>
         </div>
       </div>
 
-      <UTable :data="rows" :columns="columns" class="w-full" :loading="isLoading">
-        <template #id-cell="{ row }">
-          <span class="font-mono text-xs text-slate-400 dark:text-slate-500">#{{ row.original.id }}</span>
-        </template>
-
-        <template #customerName-cell="{ row }">
-          <div class="flex items-center gap-2.5">
-            <div class="flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-rose-700 text-[10px] font-bold text-white">
-              {{ row.original.customerName[0] }}
-            </div>
-            <span class="font-medium text-slate-800 dark:text-slate-200">{{ row.original.customerName }}</span>
-          </div>
-        </template>
-
-        <template #phoneNumber-cell="{ row }">
-          <span class="font-mono text-sm text-slate-500 dark:text-slate-400">{{ row.original.phoneNumber }}</span>
-        </template>
-
-        <template #status-cell="{ row }">
-          <UBadge :color="statusColorMap[row.original.status as PrebookingStatus]" variant="subtle" size="sm">
-            {{ statusLabelMap[row.original.status as PrebookingStatus] }}
-          </UBadge>
-        </template>
-
-        <template #prebookingDate-cell="{ row }">
-          <span class="font-mono text-sm text-slate-500 dark:text-slate-400">{{ row.original.prebookingDate }}</span>
-        </template>
-
-        <template #actions-cell="{ row }">
-          <UButton
-            icon="i-lucide-eye"
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            @click="openDetail(row.original)"
-          />
-        </template>
-      </UTable>
+      <div class="relative w-full overflow-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead v-for="col in columns" :key="col.accessorKey || col.id">{{ col.header }}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-if="isLoading">
+              <TableCell :colspan="columns.length" class="h-24 text-center">
+                <UIcon name="i-lucide-loader-2" class="size-6 animate-spin text-slate-400 mx-auto" />
+              </TableCell>
+            </TableRow>
+            <TableRow v-else-if="rows.length === 0">
+              <TableCell :colspan="columns.length" class="h-24 text-center text-slate-500">
+                No results.
+              </TableCell>
+            </TableRow>
+            <TableRow v-else v-for="row in rows" :key="row.id">
+              <TableCell><span class="font-mono text-xs text-slate-400 dark:text-slate-500">#{{ row.id }}</span></TableCell>
+              <TableCell>
+                <div class="flex items-center gap-2.5">
+                  <div class="flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-rose-700 text-[10px] font-bold text-white">
+                    {{ row.customerName[0] }}
+                  </div>
+                  <span class="font-medium text-slate-800 dark:text-slate-200">{{ row.customerName }}</span>
+                </div>
+              </TableCell>
+              <TableCell><span class="font-mono text-sm text-slate-500 dark:text-slate-400">{{ row.phoneNumber }}</span></TableCell>
+              <TableCell>{{ row.deviceModel }}</TableCell>
+              <TableCell>{{ row.preferredBranch }}</TableCell>
+              <TableCell>
+                <Badge :variant="statusColorMap[row.status as PrebookingStatus] === 'success' ? 'default' : 'secondary'">
+                  {{ statusLabelMap[row.status as PrebookingStatus] }}
+                </Badge>
+              </TableCell>
+              <TableCell><span class="font-mono text-sm text-slate-500 dark:text-slate-400">{{ row.prebookingDate }}</span></TableCell>
+              <TableCell>
+                <Button variant="ghost" size="sm" @click="openDetail(row)">
+                  <UIcon name="i-lucide-eye" class="size-4" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
 
       <!-- Pagination -->
       <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-3.5 dark:border-white/[0.05] dark:bg-white/[0.02]">
         <p class="text-xs text-slate-400 dark:text-slate-500">
           {{ t('home.table.showing') }} {{ (filter.page - 1) * filter.limit + 1 }}–{{ Math.min(filter.page * filter.limit, total) }} {{ t('home.table.from') }} {{ total.toLocaleString() }} {{ t('home.table.items') }}
         </p>
-        <UPagination v-model="filter.page" :total="total" :items-per-page="filter.limit" />
+        <Pagination v-model:page="filter.page" :total="total" :items-per-page="filter.limit" :sibling-count="1" show-edges>
+          <PaginationContent v-slot="{ items }" class="flex items-center gap-1">
+            <PaginationFirst />
+            <PaginationPrevious />
+            <template v-for="(item, index) in items" :key="index">
+              <PaginationItem v-if="item.type === 'page'" :value="item.value" as-child>
+                <Button class="w-9 h-9 p-0" :variant="item.value === filter.page ? 'default' : 'outline'" @click="filter.page = item.value">
+                  {{ item.value }}
+                </Button>
+              </PaginationItem>
+              <PaginationEllipsis v-else :index="index" />
+            </template>
+            <PaginationNext />
+            <PaginationLast />
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
 
     <!-- ─── Detail Slideover ───────────────────────────── -->
-    <USlideover v-model:open="isDetailOpen" :title="t('home.detail.title')">
-      <template v-if="selectedItem">
-        <div class="space-y-5 p-6">
-          <!-- Status + ID -->
-          <div class="flex items-center gap-3">
-            <UBadge :color="statusColorMap[selectedItem.status as PrebookingStatus]" variant="subtle" size="lg">
-              {{ statusLabelMap[selectedItem.status as PrebookingStatus] }}
-            </UBadge>
-            <span class="font-mono text-xs text-slate-400 dark:text-slate-500">#{{ selectedItem.id }}</span>
-          </div>
+    <Sheet v-model:open="isDetailOpen">
+      <SheetContent class="w-[400px] sm:w-[540px]">
+        <SheetHeader>
+          <SheetTitle>{{ t('home.detail.title') }}</SheetTitle>
+        </SheetHeader>
+        <template v-if="selectedItem">
+          <div class="space-y-5 py-6">
+            <!-- Status + ID -->
+            <div class="flex items-center gap-3">
+              <Badge variant="secondary" class="text-xs px-2.5 py-0.5">
+                {{ statusLabelMap[selectedItem.status as PrebookingStatus] }}
+              </Badge>
+              <span class="font-mono text-xs text-slate-400 dark:text-slate-500">#{{ selectedItem.id }}</span>
+            </div>
 
-          <!-- Customer avatar -->
-          <div class="flex items-center gap-3 rounded-xl bg-slate-50 p-4 dark:bg-white/[0.03]">
-            <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-rose-700 text-lg font-bold text-white shadow-lg shadow-red-600/25">
-              {{ selectedItem.customerName[0] }}
+            <!-- Customer avatar -->
+            <div class="flex items-center gap-3 rounded-xl bg-slate-50 p-4 dark:bg-white/[0.03]">
+              <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-rose-700 text-lg font-bold text-white shadow-lg shadow-red-600/25">
+                {{ selectedItem.customerName[0] }}
+              </div>
+              <div>
+                <p class="font-semibold text-slate-900 dark:text-white">{{ selectedItem.customerName }}</p>
+                <p class="font-mono text-sm text-slate-500 dark:text-slate-400">{{ selectedItem.phoneNumber }}</p>
+              </div>
             </div>
-            <div>
-              <p class="font-semibold text-slate-900 dark:text-white">{{ selectedItem.customerName }}</p>
-              <p class="font-mono text-sm text-slate-500 dark:text-slate-400">{{ selectedItem.phoneNumber }}</p>
-            </div>
-          </div>
 
-          <!-- Detail grid -->
-          <div class="grid grid-cols-2 gap-3">
-            <div class="rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('home.detail.device') }}</p>
-              <p class="mt-1.5 font-semibold text-slate-900 dark:text-white">{{ selectedItem.deviceModel }}</p>
-            </div>
-            <div class="rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('home.detail.branch') }}</p>
-              <p class="mt-1.5 font-semibold text-slate-900 dark:text-white">{{ selectedItem.preferredBranch }}</p>
-            </div>
-            <div class="col-span-2 rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('home.detail.date') }}</p>
-              <p class="mt-1.5 font-mono font-semibold text-slate-900 dark:text-white">{{ selectedItem.prebookingDate }}</p>
+            <!-- Detail grid -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('home.detail.device') }}</p>
+                <p class="mt-1.5 font-semibold text-slate-900 dark:text-white">{{ selectedItem.deviceModel }}</p>
+              </div>
+              <div class="rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('home.detail.branch') }}</p>
+                <p class="mt-1.5 font-semibold text-slate-900 dark:text-white">{{ selectedItem.preferredBranch }}</p>
+              </div>
+              <div class="col-span-2 rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('home.detail.date') }}</p>
+                <p class="mt-1.5 font-mono font-semibold text-slate-900 dark:text-white">{{ selectedItem.prebookingDate }}</p>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </USlideover>
+        </template>
+      </SheetContent>
+    </Sheet>
   </div>
 </template>
