@@ -4,18 +4,43 @@ const route = useRoute()
 
 defineEmits(['close'])
 
-const navigation = computed(() => [
-  {
-    label: t('nav.dashboard.label'),
-    sublabel: t('nav.dashboard.sublabel'),
-    icon: 'i-lucide-layout-dashboard',
-    to: '/',
-  },
+type NavChild = { label: string; sublabel: string; icon: string; to: string }
+type NavItem =
+  | { label: string; sublabel: string; icon: string; to: string; children?: never }
+  | { label: string; sublabel: string; icon: string; to?: never; children: NavChild[] }
+
+const navigation = computed((): NavItem[] => [
+  // TODO: เปิดใช้เมื่อ Dashboard พร้อม
+  // {
+  //   label: t('nav.dashboard.label'),
+  //   sublabel: t('nav.dashboard.sublabel'),
+  //   icon: 'i-lucide-layout-dashboard',
+  //   to: '/',
+  // },
   {
     label: t('nav.import.label'),
     sublabel: t('nav.import.sublabel'),
     icon: 'i-lucide-upload',
-    to: '/import',
+    children: [
+      {
+        label: t('nav.import.quota.label'),
+        sublabel: t('nav.import.quota.sublabel'),
+        icon: 'i-lucide-package',
+        to: '/import/quota',
+      },
+      {
+        label: t('nav.import.dates.label'),
+        sublabel: t('nav.import.dates.sublabel'),
+        icon: 'i-lucide-calendar-days',
+        to: '/import/dates',
+      },
+      {
+        label: t('nav.import.timeslots.label'),
+        sublabel: t('nav.import.timeslots.sublabel'),
+        icon: 'i-lucide-clock',
+        to: '/import/timeslots',
+      },
+    ],
   },
   {
     label: t('nav.export.label'),
@@ -26,6 +51,23 @@ const navigation = computed(() => [
 ])
 
 const isActive = (path: string) => route.path === path
+
+const isChildActive = (children: NavChild[]) =>
+  children.some(c => route.path === c.to)
+
+// Auto-open import group if currently on an import child route
+const openGroups = ref<Set<string>>(new Set(
+  route.path.startsWith('/import') ? ['import'] : []
+))
+
+const toggleGroup = (key: string) => {
+  const next = new Set(openGroups.value)
+  if (next.has(key)) next.delete(key)
+  else next.add(key)
+  openGroups.value = next
+}
+
+const isGroupOpen = (key: string) => openGroups.value.has(key)
 </script>
 
 <template>
@@ -67,61 +109,172 @@ const isActive = (path: string) => route.path === path
     </div>
 
     <!-- ─── Navigation ────────────────────────────────────── -->
-    <nav class="flex-1 space-y-0.5 px-3 pb-4">
-      <NuxtLink
-        v-for="item in navigation"
-        :key="item.to"
-        :to="item.to"
-        class="group relative flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200"
-        :class="[
-          isActive(item.to)
-            ? 'bg-red-500/[0.12] ring-1 ring-red-500/25 shadow-sm'
-            : 'ring-1 ring-transparent hover:bg-white/[0.04] hover:ring-white/[0.07]',
-        ]"
-        @click="$emit('close')"
-      >
-        <!-- Active left bar -->
-        <div
-          v-if="isActive(item.to)"
-          class="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-red-400"
-          style="box-shadow: 0 0 8px 1px rgba(224,0,0,0.6)"
-        />
+    <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4">
+      <template v-for="item in navigation" :key="item.label">
+        <!-- ── Group (has children) ── -->
+        <template v-if="item.children">
+          <button
+            class="group relative flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200"
+            :class="[
+              isChildActive(item.children)
+                ? 'bg-red-500/[0.12] ring-1 ring-red-500/25 shadow-sm'
+                : 'ring-1 ring-transparent hover:bg-white/[0.04] hover:ring-white/[0.07]',
+            ]"
+            @click="toggleGroup('import')"
+          >
+            <!-- Active left bar -->
+            <div
+              v-if="isChildActive(item.children)"
+              class="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-red-400"
+              style="box-shadow: 0 0 8px 1px rgba(224,0,0,0.6)"
+            />
 
-        <!-- Icon bubble -->
-        <div
-          class="flex size-8 shrink-0 items-center justify-center rounded-lg transition-all duration-200"
+            <!-- Icon bubble -->
+            <div
+              class="flex size-8 shrink-0 items-center justify-center rounded-lg transition-all duration-200"
+              :class="[
+                isChildActive(item.children)
+                  ? 'bg-gradient-to-br from-red-600 to-rose-700 text-white shadow-md shadow-red-600/30'
+                  : 'bg-slate-800 text-slate-500 group-hover:bg-slate-700/80 group-hover:text-slate-300',
+              ]"
+            >
+              <UIcon :name="item.icon" class="size-4" />
+            </div>
+
+            <!-- Labels -->
+            <div class="min-w-0 flex-1 text-left">
+              <p
+                class="text-sm font-medium leading-none transition-colors"
+                :class="isChildActive(item.children) ? 'text-red-300' : 'text-slate-300 group-hover:text-white'"
+              >
+                {{ item.label }}
+              </p>
+              <p
+                class="mt-0.5 truncate text-[11px] leading-none transition-colors"
+                :class="isChildActive(item.children) ? 'text-red-400/60' : 'text-slate-600 group-hover:text-slate-400'"
+              >
+                {{ item.sublabel }}
+              </p>
+            </div>
+
+            <!-- Chevron -->
+            <UIcon
+              name="i-lucide-chevron-right"
+              class="size-3.5 shrink-0 text-slate-500 transition-transform duration-200"
+              :class="isGroupOpen('import') ? 'rotate-90 text-slate-400' : ''"
+            />
+          </button>
+
+          <!-- Children -->
+          <div
+            v-show="isGroupOpen('import')"
+            class="ml-3 mt-0.5 space-y-0.5 border-l border-white/[0.06] pl-3"
+          >
+            <NuxtLink
+              v-for="child in item.children"
+              :key="child.to"
+              :to="child.to"
+              class="group relative flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 transition-all duration-200"
+              :class="[
+                isActive(child.to)
+                  ? 'bg-red-500/[0.10] ring-1 ring-red-500/20'
+                  : 'ring-1 ring-transparent hover:bg-white/[0.04] hover:ring-white/[0.06]',
+              ]"
+              @click="$emit('close')"
+            >
+              <!-- Icon -->
+              <div
+                class="flex size-6 shrink-0 items-center justify-center rounded-md transition-all duration-200"
+                :class="[
+                  isActive(child.to)
+                    ? 'bg-red-600/80 text-white'
+                    : 'bg-slate-800 text-slate-500 group-hover:bg-slate-700/80 group-hover:text-slate-300',
+                ]"
+              >
+                <UIcon :name="child.icon" class="size-3.5" />
+              </div>
+
+              <!-- Labels -->
+              <div class="min-w-0 flex-1">
+                <p
+                  class="text-xs font-medium leading-none transition-colors"
+                  :class="isActive(child.to) ? 'text-red-300' : 'text-slate-400 group-hover:text-white'"
+                >
+                  {{ child.label }}
+                </p>
+                <p
+                  class="mt-0.5 truncate text-[10px] leading-none transition-colors"
+                  :class="isActive(child.to) ? 'text-red-400/50' : 'text-slate-600 group-hover:text-slate-500'"
+                >
+                  {{ child.sublabel }}
+                </p>
+              </div>
+
+              <!-- Active dot -->
+              <div
+                v-if="isActive(child.to)"
+                class="size-1 shrink-0 rounded-full bg-red-400"
+                style="box-shadow: 0 0 5px 1px rgba(224,0,0,0.5)"
+              />
+            </NuxtLink>
+          </div>
+        </template>
+
+        <!-- ── Leaf item (no children) ── -->
+        <NuxtLink
+          v-else
+          :to="item.to"
+          class="group relative flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200"
           :class="[
             isActive(item.to)
-              ? 'bg-gradient-to-br from-red-600 to-rose-700 text-white shadow-md shadow-red-600/30'
-              : 'bg-slate-800 text-slate-500 group-hover:bg-slate-700/80 group-hover:text-slate-300',
+              ? 'bg-red-500/[0.12] ring-1 ring-red-500/25 shadow-sm'
+              : 'ring-1 ring-transparent hover:bg-white/[0.04] hover:ring-white/[0.07]',
           ]"
+          @click="$emit('close')"
         >
-          <UIcon :name="item.icon" class="size-4" />
-        </div>
+          <!-- Active left bar -->
+          <div
+            v-if="isActive(item.to)"
+            class="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-red-400"
+            style="box-shadow: 0 0 8px 1px rgba(224,0,0,0.6)"
+          />
 
-        <!-- Labels -->
-        <div class="min-w-0 flex-1">
-          <p
-            class="text-sm font-medium leading-none transition-colors"
-            :class="isActive(item.to) ? 'text-red-300' : 'text-slate-300 group-hover:text-white'"
+          <!-- Icon bubble -->
+          <div
+            class="flex size-8 shrink-0 items-center justify-center rounded-lg transition-all duration-200"
+            :class="[
+              isActive(item.to)
+                ? 'bg-gradient-to-br from-red-600 to-rose-700 text-white shadow-md shadow-red-600/30'
+                : 'bg-slate-800 text-slate-500 group-hover:bg-slate-700/80 group-hover:text-slate-300',
+            ]"
           >
-            {{ item.label }}
-          </p>
-          <p
-            class="mt-0.5 truncate text-[11px] leading-none transition-colors"
-            :class="isActive(item.to) ? 'text-red-400/60' : 'text-slate-600 group-hover:text-slate-400'"
-          >
-            {{ item.sublabel }}
-          </p>
-        </div>
+            <UIcon :name="item.icon" class="size-4" />
+          </div>
 
-        <!-- Active glow dot -->
-        <div
-          v-if="isActive(item.to)"
-          class="size-1.5 shrink-0 rounded-full bg-red-400"
-          style="box-shadow: 0 0 7px 2px rgba(224,0,0,0.5)"
-        />
-      </NuxtLink>
+          <!-- Labels -->
+          <div class="min-w-0 flex-1">
+            <p
+              class="text-sm font-medium leading-none transition-colors"
+              :class="isActive(item.to) ? 'text-red-300' : 'text-slate-300 group-hover:text-white'"
+            >
+              {{ item.label }}
+            </p>
+            <p
+              class="mt-0.5 truncate text-[11px] leading-none transition-colors"
+              :class="isActive(item.to) ? 'text-red-400/60' : 'text-slate-600 group-hover:text-slate-400'"
+            >
+              {{ item.sublabel }}
+            </p>
+          </div>
+
+          <!-- Active glow dot -->
+          <div
+            v-if="isActive(item.to)"
+            class="size-1.5 shrink-0 rounded-full bg-red-400"
+            style="box-shadow: 0 0 7px 2px rgba(224,0,0,0.5)"
+          />
+        </NuxtLink>
+      </template>
     </nav>
 
     <!-- ─── Bottom status ─────────────────────────────────── -->

@@ -143,9 +143,10 @@ const fileSizeLabel = computed(() => {
         <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{{ t('import.title') }}</h1>
         <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ t('import.subtitle') }}</p>
       </div>
-      <UButton variant="outline" icon="i-lucide-file-spreadsheet" size="sm" class="shrink-0" @click="downloadTemplate">
+      <Button variant="outline" size="sm" class="shrink-0" @click="downloadTemplate">
+        <UIcon name="i-lucide-file-spreadsheet" class="mr-2 size-4" />
         {{ t('import.downloadTemplate') }}
-      </UButton>
+      </Button>
     </div>
 
     <!-- ─── Step progress ─────────────────────────────── -->
@@ -281,34 +282,46 @@ const fileSizeLabel = computed(() => {
           </div>
         </div>
 
-        <UTable :data="previewData.sampleRows" :columns="previewColumns">
-          <template #row-cell="{ row }">
-            <span class="font-mono text-xs text-slate-400">{{ row.original.row }}</span>
-          </template>
-          <template #valid-cell="{ row }">
-            <span
-              class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
-              :class="row.original.valid
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'"
-            >
-              <UIcon :name="row.original.valid ? 'i-lucide-check' : 'i-lucide-x'" class="size-3" />
-              {{ row.original.valid ? t('import.preview.valid') : t('import.preview.error') }}
-            </span>
-          </template>
-          <template #error-cell="{ row }">
-            <span v-if="row.original.error" class="text-xs text-red-500 dark:text-red-400">{{ row.original.error }}</span>
-            <span v-else class="text-xs text-slate-300 dark:text-slate-600">—</span>
-          </template>
-        </UTable>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead v-for="col in previewColumns" :key="col.accessorKey">{{ col.header }}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="(row, idx) in previewData.sampleRows" :key="idx">
+              <TableCell><span class="font-mono text-xs text-slate-400">{{ row.row }}</span></TableCell>
+              <TableCell>{{ row.customer_name }}</TableCell>
+              <TableCell>{{ row.phone_number }}</TableCell>
+              <TableCell>{{ row.device_model }}</TableCell>
+              <TableCell>
+                <span
+                  class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                  :class="row.valid
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+                    : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'"
+                >
+                  <UIcon :name="row.valid ? 'i-lucide-check' : 'i-lucide-x'" class="size-3" />
+                  {{ row.valid ? t('import.preview.valid') : t('import.preview.error') }}
+                </span>
+              </TableCell>
+              <TableCell>
+                <span v-if="row.error" class="text-xs text-red-500 dark:text-red-400">{{ row.error }}</span>
+                <span v-else class="text-xs text-slate-300 dark:text-slate-600">—</span>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
 
         <div class="flex items-center justify-between border-t border-slate-100 bg-slate-50/70 px-5 py-4 dark:border-white/[0.05] dark:bg-white/[0.02]">
-          <UButton variant="ghost" color="neutral" icon="i-lucide-arrow-left" size="sm" @click="resetImport">
+          <Button variant="ghost" size="sm" @click="resetImport">
+            <UIcon name="i-lucide-arrow-left" class="mr-2 size-4" />
             {{ t('import.preview.back') }}
-          </UButton>
-          <UButton icon="i-lucide-play" size="sm" @click="startImport">
+          </Button>
+          <Button size="sm" @click="startImport">
+            <UIcon name="i-lucide-play" class="mr-2 size-4" />
             {{ t('import.preview.start', { count: previewData.validRows }) }}
-          </UButton>
+          </Button>
         </div>
       </div>
     </template>
@@ -374,12 +387,14 @@ const fileSizeLabel = computed(() => {
         </div>
       </div>
       <div class="flex gap-3">
-        <UButton variant="outline" icon="i-lucide-download" color="neutral" size="sm">
+        <Button variant="outline" size="sm">
+          <UIcon name="i-lucide-download" class="mr-2 size-4" />
           {{ t('import.result.errorReport') }}
-        </UButton>
-        <UButton icon="i-lucide-plus" size="sm" @click="resetImport">
+        </Button>
+        <Button size="sm" @click="resetImport">
+          <UIcon name="i-lucide-plus" class="mr-2 size-4" />
           {{ t('import.result.again') }}
-        </UButton>
+        </Button>
       </div>
     </div>
   </div>

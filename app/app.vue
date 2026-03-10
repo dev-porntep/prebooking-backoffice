@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Toaster } from '@/components/ui/sonner'
 const colorMode = useColorMode()
 
 const color = computed(() => colorMode.value === 'dark' ? '#0F172A' : '#F8FAFC')
@@ -37,6 +38,7 @@ useSeoMeta({
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <Toaster />
 </template>
 
 <style>

@@ -1,396 +1,263 @@
 <script setup lang="ts">
-import type { PrebookingStatus, PrebookingFilter } from '~/types/prebooking'
-import { toast } from 'vue3-toastify'
-
-const { t } = useI18n()
-
 definePageMeta({ title: 'Home' })
-useHead({ title: 'Home' })
+useHead({ title: 'Prebooking Back Office' })
 
-// ── Filter ──────────────────────────────────────────
-const filter = reactive<PrebookingFilter>({
-  search: '',
-  status: '',
-  deviceModel: '',
-  branch: '',
-  dateFrom: '',
-  dateTo: '',
-  page: 1,
-  limit: 20,
+const { user: sessionUser } = useUserSession()
+const userName = computed(() => (sessionUser.value as { name?: string } | null)?.name ?? 'Admin')
+
+const today = new Date().toLocaleDateString('th-TH', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
 })
 
-// ── SSR Data Fetching ────────────────────────────────
-const { data: prebookingData, refresh, pending: isLoading } = await useAsyncData(
-  'prebookings',
-  () => $fetch('/api/prebooking', { query: toRaw(filter) }),
-  { watch: [filter] },
-)
+const quickActions = [
+  {
+    title: 'Quota สินค้า',
+    desc: 'ตั้งค่า Quota ตาม Mat Code/SKU แยก Normal/Special',
+    icon: 'i-lucide-package',
+    to: '/import/quota',
+    from: 'from-red-500',
+    to_color: 'to-rose-600',
+    glow: 'shadow-red-500/20',
+    ring: 'ring-red-500/20',
+    badge: 'bg-red-500/10 text-red-400',
+    tag: 'Import',
+  },
+  {
+    title: 'ตารางวันจอง-รับ',
+    desc: 'Mapping วันจอง Prebooking ไปยังวันรับสินค้า',
+    icon: 'i-lucide-calendar-days',
+    to: '/import/dates',
+    from: 'from-sky-500',
+    to_color: 'to-blue-600',
+    glow: 'shadow-sky-500/20',
+    ring: 'ring-sky-500/20',
+    badge: 'bg-sky-500/10 text-sky-400',
+    tag: 'Import',
+  },
+  {
+    title: 'ช่วงเวลารับสินค้า',
+    desc: 'กำหนด Time Slots สำหรับการรับเครื่อง',
+    icon: 'i-lucide-clock',
+    to: '/import/timeslots',
+    from: 'from-violet-500',
+    to_color: 'to-purple-600',
+    glow: 'shadow-violet-500/20',
+    ring: 'ring-violet-500/20',
+    badge: 'bg-violet-500/10 text-violet-400',
+    tag: 'Import',
+  },
+  {
+    title: 'Export ข้อมูล',
+    desc: 'ส่งออกข้อมูล Prebooking เป็นไฟล์ Excel',
+    icon: 'i-lucide-download',
+    to: '/export',
+    from: 'from-emerald-500',
+    to_color: 'to-teal-600',
+    glow: 'shadow-emerald-500/20',
+    ring: 'ring-emerald-500/20',
+    badge: 'bg-emerald-500/10 text-emerald-400',
+    tag: 'Export',
+  },
+]
 
-const rows = computed(() => prebookingData.value?.data ?? [])
-const total = computed(() => prebookingData.value?.total ?? 0)
-const apiStats = computed(() => prebookingData.value?.stats)
+const capabilities = [
+  {
+    icon: 'i-lucide-package',
+    title: 'นำเข้า Quota สินค้า',
+    desc: 'ตั้งค่า Quota ตาม Mat Code/SKU แยกประเภท Normal และ Special พร้อมกำหนดวันเริ่ม-สิ้นสุดการจอง',
+    color: 'text-red-500 dark:text-red-400',
+    bg: 'bg-red-50 dark:bg-red-500/10',
+  },
+  {
+    icon: 'i-lucide-calendar-days',
+    title: 'ตั้งค่าตารางวันจอง → รับสินค้า',
+    desc: 'Mapping วันจอง Prebooking ไปยังวันรับสินค้า คำนวณข้ามวันหยุดนักขัตฤกษ์อัตโนมัติ',
+    color: 'text-sky-500 dark:text-sky-400',
+    bg: 'bg-sky-50 dark:bg-sky-500/10',
+  },
+  {
+    icon: 'i-lucide-clock',
+    title: 'ตั้งค่าช่วงเวลารับสินค้า',
+    desc: 'กำหนด Time Slots สำหรับการรับเครื่อง เช่น 11:00–13:00 และ 16:00–19:00',
+    color: 'text-violet-500 dark:text-violet-400',
+    bg: 'bg-violet-50 dark:bg-violet-500/10',
+  },
+  {
+    icon: 'i-lucide-file-spreadsheet',
+    title: 'Export ข้อมูล Prebooking',
+    desc: 'ส่งออกข้อมูลเป็นไฟล์ Excel พร้อม filter เงื่อนไขตามวันที่ สถานะ และสาขา',
+    color: 'text-emerald-500 dark:text-emerald-400',
+    bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+  },
+]
 
-// ── Stats ───────────────────────────────────────────
-const stats = computed(() => {
-  const s = apiStats.value
-  const pendingPct = s?.total ? Math.round((s.pending / s.total) * 100) : 0
-  const confirmedPct = s?.total ? Math.round((s.confirmed / s.total) * 100) : 0
-  const cancelledPct = s?.total ? Math.round((s.cancelled / s.total) * 100) : 0
+const limitations = [
+  { icon: 'i-lucide-hard-drive', label: 'ขนาดไฟล์สูงสุด', value: '50 MB ต่อไฟล์' },
+  { icon: 'i-lucide-rows', label: 'จำนวน Rows สูงสุด', value: '100,000 แถวต่อไฟล์' },
+  { icon: 'i-lucide-layers', label: 'ขนาด Chunk', value: '500 แถวต่อ batch' },
+  { icon: 'i-lucide-file-type', label: 'ประเภทไฟล์', value: '.xlsx และ .xls เท่านั้น' },
+  { icon: 'i-lucide-layout-dashboard', label: 'Dashboard', value: 'อยู่ระหว่างพัฒนา' },
+  { icon: 'i-lucide-shield-check', label: 'Authentication', value: 'ต้องตั้งค่า SSO ก่อนใช้งานจริง' },
+]
 
-  return [
-    {
-      label: t('home.stats.total'),
-      value: s?.total ?? 0,
-      icon: 'i-lucide-smartphone',
-      gradient: 'from-red-600 to-rose-700',
-      glow: 'shadow-red-600/20',
-      bg: 'bg-red-50 dark:bg-red-500/10',
-      iconColor: 'text-red-600 dark:text-red-400',
-      accentBar: 'bg-red-600',
-      progressBar: 'bg-gradient-to-r from-red-600 to-rose-600',
-      trend: '+12%',
-      trendUp: true,
-      percent: 100,
-    },
-    {
-      label: t('home.stats.pending'),
-      value: s?.pending ?? 0,
-      icon: 'i-lucide-clock',
-      gradient: 'from-amber-500 to-orange-500',
-      glow: 'shadow-amber-500/20',
-      bg: 'bg-amber-50 dark:bg-amber-500/10',
-      iconColor: 'text-amber-600 dark:text-amber-400',
-      accentBar: 'bg-amber-500',
-      progressBar: 'bg-gradient-to-r from-amber-400 to-orange-500',
-      trend: '+5%',
-      trendUp: true,
-      percent: pendingPct,
-    },
-    {
-      label: t('home.stats.confirmed'),
-      value: s?.confirmed ?? 0,
-      icon: 'i-lucide-check-circle',
-      gradient: 'from-emerald-500 to-teal-500',
-      glow: 'shadow-emerald-500/20',
-      bg: 'bg-emerald-50 dark:bg-emerald-500/10',
-      iconColor: 'text-emerald-600 dark:text-emerald-400',
-      accentBar: 'bg-emerald-500',
-      progressBar: 'bg-gradient-to-r from-emerald-400 to-teal-500',
-      trend: '+18%',
-      trendUp: true,
-      percent: confirmedPct,
-    },
-    {
-      label: t('home.stats.cancelled'),
-      value: s?.cancelled ?? 0,
-      icon: 'i-lucide-x-circle',
-      gradient: 'from-red-500 to-rose-500',
-      glow: 'shadow-red-500/20',
-      bg: 'bg-red-50 dark:bg-red-500/10',
-      iconColor: 'text-red-600 dark:text-red-400',
-      accentBar: 'bg-red-500',
-      progressBar: 'bg-gradient-to-r from-red-400 to-rose-500',
-      trend: '-3%',
-      trendUp: false,
-      percent: cancelledPct,
-    },
-  ]
-})
-
-// ── Filter helpers ───────────────────────────────────
-const statusOptions = computed(() => [
-  { label: t('status.all'), value: 'all' },
-  { label: t('status.pending'), value: 'pending' },
-  { label: t('status.confirmed'), value: 'confirmed' },
-  { label: t('status.cancelled'), value: 'cancelled' },
-  { label: t('status.completed'), value: 'completed' },
-])
-
-const selectedStatus = computed({
-  get: () => filter.status || 'all',
-  set: (v: string) => { filter.status = v === 'all' ? '' : v as PrebookingStatus },
-})
-
-const hasActiveFilters = computed(() =>
-  filter.search || filter.status || filter.deviceModel || filter.branch || filter.dateFrom || filter.dateTo,
-)
-
-const resetFilters = () => {
-  filter.search = ''
-  filter.status = ''
-  filter.deviceModel = ''
-  filter.branch = ''
-  filter.dateFrom = ''
-  filter.dateTo = ''
-  filter.page = 1
-}
-
-// ── Table ───────────────────────────────────────────
-const columns = computed(() => [
-  { accessorKey: 'id', header: t('home.table.col.id') },
-  { accessorKey: 'customerName', header: t('home.table.col.customerName') },
-  { accessorKey: 'phoneNumber', header: t('home.table.col.phone') },
-  { accessorKey: 'deviceModel', header: t('home.table.col.device') },
-  { accessorKey: 'branch', header: t('home.table.col.branch') },
-  { accessorKey: 'status', header: t('home.table.col.status') },
-  { accessorKey: 'prebookingDate', header: t('home.table.col.date') },
-  { id: 'actions', header: '' },
-])
-
-type BadgeColor = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral'
-
-const statusColorMap: Record<PrebookingStatus, BadgeColor> = {
-  pending: 'warning',
-  confirmed: 'success',
-  cancelled: 'error',
-  completed: 'info',
-}
-
-const statusLabelMap = computed((): Record<PrebookingStatus, string> => ({
-  pending: t('status.pending'),
-  confirmed: t('status.confirmed'),
-  cancelled: t('status.cancelled'),
-  completed: t('status.completed'),
-}))
-
-// ── Refresh ─────────────────────────────────────────
-const handleRefresh = async () => {
-  await refresh()
-  toast.success(t('toast.home.refreshed'))
-}
-
-// ── Detail Slideover ────────────────────────────────
-type RowItem = NonNullable<typeof prebookingData.value>['data'][number]
-const selectedItem = ref<RowItem | null>(null)
-const isDetailOpen = ref(false)
-
-const openDetail = (item: RowItem) => {
-  selectedItem.value = item
-  isDetailOpen.value = true
-}
+const techStack = [
+  { label: 'nuxt-auth-utils', value: 'v0.5.29' },
+  { label: 'Nuxt', value: '4' },
+  { label: 'App Version', value: 'v1.0.0' },
+]
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- ─── Page header ────────────────────────────────── -->
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          {{ t('home.title') }}
-        </h1>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {{ t('home.updated') }}
-        </p>
-      </div>
-      <UButton icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" class="shrink-0" :loading="isLoading" @click="handleRefresh">
-        {{ t('home.refresh') }}
-      </UButton>
-    </div>
+  <div class="min-h-full space-y-8 p-6 lg:p-8">
 
-    <!-- ─── Stats grid ─────────────────────────────────── -->
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <!-- ─── Hero ──────────────────────────────────────────── -->
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 shadow-xl dark:from-[#0C1220] dark:via-[#101828] dark:to-[#0C1220]">
+      <!-- Dot grid texture -->
       <div
-        v-for="stat in stats"
-        :key="stat.label"
-        class="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/[0.06] dark:bg-slate-900"
-        :class="'hover:' + stat.glow"
-      >
-        <!-- Top accent bar -->
-        <div :class="['h-1 w-full', stat.accentBar]" />
+        class="pointer-events-none absolute inset-0 opacity-[0.06]"
+        style="background-image: radial-gradient(circle at 1.5px 1.5px, white 1px, transparent 0); background-size: 28px 28px;"
+      />
+      <!-- Red glow blob -->
+      <div class="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-red-600/20 blur-3xl" />
+      <div class="pointer-events-none absolute -bottom-16 left-1/3 size-56 rounded-full bg-rose-700/10 blur-3xl" />
 
-        <div class="p-5">
-          <div class="flex items-start justify-between gap-3">
-            <div class="min-w-0">
-              <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                {{ stat.label }}
-              </p>
-              <p class="mt-2 font-mono text-3xl font-bold tabular-nums text-slate-900 dark:text-white">
-                {{ stat.value.toLocaleString() }}
-              </p>
-            </div>
-            <!-- Icon circle -->
-            <div :class="['flex size-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110', stat.bg]">
-              <UIcon :name="stat.icon" :class="['size-5', stat.iconColor]" />
-            </div>
+      <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div class="space-y-2">
+          <!-- Online badge -->
+          <div class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+            <span class="relative flex size-1.5">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span class="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+            </span>
+            ระบบออนไลน์
           </div>
 
-          <!-- Progress bar showing % of total -->
-          <div class="mt-4 space-y-1.5">
-            <div class="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-              <div
-                :class="['h-full rounded-full transition-all duration-700', stat.progressBar]"
-                :style="{ width: `${stat.percent}%` }"
-              />
-            </div>
-            <div class="flex items-center justify-between">
-              <div :class="['flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-semibold', stat.trendUp ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400']">
-                <UIcon :name="stat.trendUp ? 'i-lucide-trending-up' : 'i-lucide-trending-down'" class="size-3" />
-                {{ stat.trend }}
-              </div>
-              <span class="text-[11px] font-medium text-slate-400 dark:text-slate-500">{{ stat.percent }}%</span>
-            </div>
-          </div>
+          <h1 class="text-3xl font-bold text-white">
+            สวัสดี, <span class="bg-gradient-to-r from-red-400 to-rose-400 bg-clip-text text-transparent">{{ userName }}</span>
+          </h1>
+          <p class="text-sm text-slate-400">ระบบจัดการ Prebooking Back Office</p>
+        </div>
+
+        <div class="shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.04] px-5 py-3.5 backdrop-blur-sm">
+          <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">วันที่วันนี้</p>
+          <p class="mt-1 text-sm font-medium text-slate-200">{{ today }}</p>
         </div>
       </div>
     </div>
 
-    <!-- ─── Filter bar ─────────────────────────────────── -->
-    <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-white/[0.06] dark:bg-slate-900">
-      <!-- Header -->
-      <div class="flex items-center gap-2.5 border-b border-slate-100 bg-slate-50/70 px-5 py-3 dark:border-white/[0.05] dark:bg-white/[0.02]">
-        <UIcon name="i-lucide-sliders-horizontal" class="size-4 text-slate-400 dark:text-slate-500" />
-        <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ t('home.filter.title') }}</p>
-        <span
-          v-if="hasActiveFilters"
-          class="ml-auto inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-400"
+    <!-- ─── Quick Actions ─────────────────────────────────── -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2.5">
+        <div class="h-px flex-1 bg-slate-200 dark:bg-white/[0.06]" />
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-400">เมนูด่วน</p>
+        <div class="h-px flex-1 bg-slate-200 dark:bg-white/[0.06]" />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <button
+          v-for="action in quickActions"
+          :key="action.to"
+          class="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-white/[0.06] dark:bg-slate-900"
+          :class="'hover:' + action.glow + ' hover:ring-1 hover:' + action.ring"
+          @click="navigateTo(action.to)"
         >
-          <span class="size-1.5 rounded-full bg-red-600" />
-          {{ t('home.filter.active') }}
-        </span>
+          <!-- Top gradient line -->
+          <div :class="['h-0.5 w-full bg-gradient-to-r', action.from, action.to_color]" />
+
+          <div class="p-5">
+            <!-- Icon + tag row -->
+            <div class="flex items-start justify-between">
+              <div :class="['flex size-10 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md', action.from, action.to_color]">
+                <UIcon :name="action.icon" class="size-5" />
+              </div>
+              <span :class="['rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide', action.badge]">
+                {{ action.tag }}
+              </span>
+            </div>
+
+            <div class="mt-4">
+              <p class="font-semibold text-slate-900 dark:text-white">{{ action.title }}</p>
+              <p class="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{{ action.desc }}</p>
+            </div>
+
+            <!-- Arrow -->
+            <div class="mt-4 flex items-center gap-1 text-xs font-medium text-slate-400 transition-all duration-200 group-hover:gap-2 group-hover:text-slate-600 dark:group-hover:text-slate-200">
+              <span>เปิดหน้านี้</span>
+              <UIcon name="i-lucide-arrow-right" class="size-3.5" />
+            </div>
+          </div>
+        </button>
       </div>
+    </section>
 
-      <div class="p-4">
-        <div class="flex flex-wrap items-end gap-3">
-          <UFormField :label="t('home.filter.search')" class="min-w-52 flex-1">
-            <UInput
-              v-model="filter.search"
-              icon="i-lucide-search"
-              :placeholder="t('home.filter.searchPlaceholder')"
-            />
-          </UFormField>
+    <!-- ─── Capabilities + Limitations ────────────────────── -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
-          <UFormField :label="t('home.filter.status')">
-            <USelect v-model="selectedStatus" :items="statusOptions" class="w-40" />
-          </UFormField>
-
-          <UFormField :label="t('home.filter.dateFrom')">
-            <UInput v-model="filter.dateFrom" type="date" class="w-38" />
-          </UFormField>
-
-          <UFormField :label="t('home.filter.dateTo')">
-            <UInput v-model="filter.dateTo" type="date" class="w-38" />
-          </UFormField>
-
-          <UButton
-            variant="ghost"
-            color="neutral"
-            icon="i-lucide-rotate-ccw"
-            :disabled="!hasActiveFilters"
-            class="text-slate-500 hover:text-slate-900 disabled:opacity-40 dark:hover:text-white"
-            @click="resetFilters"
-          >
-            {{ t('home.filter.reset') }}
-          </UButton>
-        </div>
-      </div>
-    </div>
-
-    <!-- ─── Data table ─────────────────────────────────── -->
-    <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-white/[0.06] dark:bg-slate-900">
-      <!-- Table header bar -->
-      <div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-5 py-3.5 dark:border-white/[0.05] dark:bg-white/[0.02]">
-        <div class="flex items-center gap-2.5">
-          <div class="size-2 rounded-full bg-red-600" style="box-shadow:0 0 6px 2px rgba(224,0,0,0.5)" />
-          <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ t('home.table.title') }}</p>
-        </div>
+      <!-- Capabilities (2/3 width) -->
+      <section class="lg:col-span-2 space-y-4">
         <div class="flex items-center gap-2">
-          <UBadge color="neutral" variant="subtle" size="sm">
-            {{ total.toLocaleString() }} {{ t('home.table.items') }}
-          </UBadge>
-          <UButton icon="i-lucide-download" color="neutral" variant="ghost" size="xs">
-            Export
-          </UButton>
+          <UIcon name="i-lucide-sparkles" class="size-4 text-red-500" />
+          <h2 class="text-sm font-semibold text-slate-900 dark:text-white">ความสามารถของระบบ</h2>
         </div>
-      </div>
 
-      <UTable :data="rows" :columns="columns" class="w-full" :loading="isLoading">
-        <template #id-cell="{ row }">
-          <span class="font-mono text-xs text-slate-400 dark:text-slate-500">#{{ row.original.id }}</span>
-        </template>
-
-        <template #customerName-cell="{ row }">
-          <div class="flex items-center gap-2.5">
-            <div class="flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-rose-700 text-[10px] font-bold text-white">
-              {{ row.original.customerName[0] }}
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div
+            v-for="cap in capabilities"
+            :key="cap.title"
+            class="rounded-xl border border-slate-200/80 bg-white p-4 dark:border-white/[0.06] dark:bg-slate-900"
+          >
+            <div class="flex items-start gap-3">
+              <div :class="['mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg', cap.bg]">
+                <UIcon :name="cap.icon" :class="['size-4', cap.color]" />
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ cap.title }}</p>
+                <p class="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{{ cap.desc }}</p>
+              </div>
             </div>
-            <span class="font-medium text-slate-800 dark:text-slate-200">{{ row.original.customerName }}</span>
           </div>
-        </template>
+        </div>
+      </section>
 
-        <template #phoneNumber-cell="{ row }">
-          <span class="font-mono text-sm text-slate-500 dark:text-slate-400">{{ row.original.phoneNumber }}</span>
-        </template>
+      <!-- Limitations (1/3 width) -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-2">
+          <UIcon name="i-lucide-triangle-alert" class="size-4 text-amber-500" />
+          <h2 class="text-sm font-semibold text-slate-900 dark:text-white">ข้อจำกัดของระบบ</h2>
+        </div>
 
-        <template #status-cell="{ row }">
-          <UBadge :color="statusColorMap[row.original.status as PrebookingStatus]" variant="subtle" size="sm">
-            {{ statusLabelMap[row.original.status as PrebookingStatus] }}
-          </UBadge>
-        </template>
+        <div class="rounded-xl border border-amber-200/60 bg-amber-50/50 dark:border-amber-500/10 dark:bg-amber-500/5">
+          <ul class="divide-y divide-amber-100 dark:divide-amber-500/10">
+            <li
+              v-for="limit in limitations"
+              :key="limit.label"
+              class="flex items-start gap-3 px-4 py-3"
+            >
+              <UIcon :name="limit.icon" class="mt-0.5 size-3.5 shrink-0 text-amber-500 dark:text-amber-400" />
+              <div class="min-w-0 flex-1">
+                <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400">{{ limit.label }}</p>
+                <p class="mt-0.5 text-xs font-semibold text-slate-800 dark:text-slate-200">{{ limit.value }}</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
 
-        <template #prebookingDate-cell="{ row }">
-          <span class="font-mono text-sm text-slate-500 dark:text-slate-400">{{ row.original.prebookingDate }}</span>
-        </template>
-
-        <template #actions-cell="{ row }">
-          <UButton
-            icon="i-lucide-eye"
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            @click="openDetail(row.original)"
-          />
-        </template>
-      </UTable>
-
-      <!-- Pagination -->
-      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-3.5 dark:border-white/[0.05] dark:bg-white/[0.02]">
-        <p class="text-xs text-slate-400 dark:text-slate-500">
-          {{ t('home.table.showing') }} {{ (filter.page - 1) * filter.limit + 1 }}–{{ Math.min(filter.page * filter.limit, total) }} {{ t('home.table.from') }} {{ total.toLocaleString() }} {{ t('home.table.items') }}
-        </p>
-        <UPagination v-model="filter.page" :total="total" :items-per-page="filter.limit" />
+    <!-- ─── Tech Footer ────────────────────────────────────── -->
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-slate-200/60 pt-4 dark:border-white/[0.05]">
+      <div
+        v-for="tech in techStack"
+        :key="tech.label"
+        class="flex items-center gap-1.5"
+      >
+        <span class="text-[11px] text-slate-400 dark:text-slate-500">{{ tech.label }}</span>
+        <span class="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-600 dark:bg-white/[0.05] dark:text-slate-400">{{ tech.value }}</span>
       </div>
     </div>
 
-    <!-- ─── Detail Slideover ───────────────────────────── -->
-    <USlideover v-model:open="isDetailOpen" :title="t('home.detail.title')">
-      <template v-if="selectedItem">
-        <div class="space-y-5 p-6">
-          <!-- Status + ID -->
-          <div class="flex items-center gap-3">
-            <UBadge :color="statusColorMap[selectedItem.status as PrebookingStatus]" variant="subtle" size="lg">
-              {{ statusLabelMap[selectedItem.status as PrebookingStatus] }}
-            </UBadge>
-            <span class="font-mono text-xs text-slate-400 dark:text-slate-500">#{{ selectedItem.id }}</span>
-          </div>
-
-          <!-- Customer avatar -->
-          <div class="flex items-center gap-3 rounded-xl bg-slate-50 p-4 dark:bg-white/[0.03]">
-            <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-rose-700 text-lg font-bold text-white shadow-lg shadow-red-600/25">
-              {{ selectedItem.customerName[0] }}
-            </div>
-            <div>
-              <p class="font-semibold text-slate-900 dark:text-white">{{ selectedItem.customerName }}</p>
-              <p class="font-mono text-sm text-slate-500 dark:text-slate-400">{{ selectedItem.phoneNumber }}</p>
-            </div>
-          </div>
-
-          <!-- Detail grid -->
-          <div class="grid grid-cols-2 gap-3">
-            <div class="rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('home.detail.device') }}</p>
-              <p class="mt-1.5 font-semibold text-slate-900 dark:text-white">{{ selectedItem.deviceModel }}</p>
-            </div>
-            <div class="rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('home.detail.branch') }}</p>
-              <p class="mt-1.5 font-semibold text-slate-900 dark:text-white">{{ selectedItem.preferredBranch }}</p>
-            </div>
-            <div class="col-span-2 rounded-xl border border-slate-100 bg-slate-50 p-3.5 dark:border-white/[0.06] dark:bg-white/[0.03]">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ t('home.detail.date') }}</p>
-              <p class="mt-1.5 font-mono font-semibold text-slate-900 dark:text-white">{{ selectedItem.prebookingDate }}</p>
-            </div>
-          </div>
-        </div>
-      </template>
-    </USlideover>
   </div>
 </template>

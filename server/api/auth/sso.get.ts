@@ -1,4 +1,3 @@
-export default defineEventHandler(async () => {
-  // TODO: Redirect ไป SSO provider จริง
-  return sendRedirect(useEvent(), '/login?error=sso_not_configured')
-})
+export default defineEventHandler(event =>
+  sendRedirect(event, '/auth/google')
+)
