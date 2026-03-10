@@ -115,12 +115,18 @@
       "downloadTemplate": "ดาวน์โหลด Template Quota",
       "preview": {
         "col": {
-          "matCode": "Mat Code",
-          "productName": "ชื่อสินค้า",
-          "color": "สี",
-          "storage": "ความจุ",
-          "branchCode": "รหัสสาขา",
-          "quota": "Quota"
+          "campaignType": "ประเภท",
+          "brand": "แบรนด์",
+          "matCode": "Mat Code/SKU",
+          "displayName": "ชื่อแสดงบนเว็บ",
+          "quota": "Quota",
+          "serviceCode": "Service Code",
+          "depositAmount": "คำมัดจำ (฿)",
+          "channel": "Channel",
+          "bookingStart": "วันเริ่มจอง",
+          "bookingEnd": "วันสิ้นสุดจอง",
+          "pickupStart": "วันเริ่มรับ",
+          "pickupMessage": "ข้อความแจ้งรับ"
         }
       }
     },
@@ -195,35 +201,16 @@
   },
   "export": {
     "title": "Export Prebooking Data",
-    "subtitle": "ส่งออกข้อมูล Prebooking เป็นไฟล์ Excel",
-    "condition": "กำหนดเงื่อนไข Export",
-    "conditionDesc": "เลือกตัวกรองที่ต้องการ หรือปล่อยว่างเพื่อ Export ทั้งหมด",
-    "quickDate": "ช่วงเวลาด่วน",
-    "today": "วันนี้",
-    "last7": "7 วันล่าสุด",
-    "last30": "30 วันล่าสุด",
-    "last90": "90 วันล่าสุด",
-    "dateFrom": "วันที่เริ่มต้น",
-    "dateTo": "วันที่สิ้นสุด",
-    "status": "สถานะ",
-    "device": "รุ่นมือถือ",
-    "branch": "สาขา",
-    "devicePlaceholder": "เช่น iPhone 16 Pro",
-    "branchPlaceholder": "เช่น สาขากลาง",
-    "reset": "รีเซ็ตเงื่อนไข",
-    "activeFilter": "มีตัวกรองที่เลือก",
-    "start": "Export เป็น Excel",
-    "generating": "กำลังสร้างไฟล์ Excel...",
-    "history": {
-      "title": "ประวัติการ Export",
-      "subtitle": "รายการ Export ล่าสุด",
-      "items": "รายการ",
-      "rows": "แถว",
-      "colDate": "วันที่ Export",
-      "colFilter": "เงื่อนไข",
-      "colRows": "จำนวน",
-      "download": "ดาวน์โหลด"
-    }
+    "subtitle": "ส่งออกข้อมูล Prebooking ทั้งหมดเป็นไฟล์ Excel หรือ CSV",
+    "format": "เลือกรูปแบบไฟล์",
+    "formatExcel": "Excel (.xlsx)",
+    "formatExcelDesc": "รองรับ Microsoft Excel, Google Sheets",
+    "formatCsv": "CSV",
+    "formatCsvDesc": "รองรับทุกโปรแกรม, ขนาดไฟล์เล็กกว่า",
+    "exportAll": "Export ข้อมูลทั้งหมด",
+    "exportAllDesc": "Export ข้อมูล Prebooking ทั้งหมด เป็นไฟล์ {format}",
+    "start": "Export",
+    "generating": "กำลังสร้างไฟล์ {format}..."
   },
   "login": {
     "title": "เข้าสู่ระบบ",

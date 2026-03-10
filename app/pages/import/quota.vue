@@ -36,9 +36,9 @@ const previewData = ref({
   validRows: 22,
   errorRows: 2,
   sampleRows: [
-    { row: 2, mat_code: 'MAT-001', product_name: 'iPhone 16 Pro', color: 'Black Titanium', storage: '256GB', branch_code: 'BKK-001', quota: 50, valid: true, error: '' },
-    { row: 3, mat_code: '', product_name: 'iPhone 16 Pro Max', color: 'Desert Titanium', storage: '512GB', branch_code: 'BKK-002', quota: 30, valid: false, error: 'mat_code ว่าง' },
-    { row: 4, mat_code: 'MAT-003', product_name: 'Samsung S25 Ultra', color: 'Titanium Black', storage: '256GB', branch_code: 'BKK-001', quota: 20, valid: true, error: '' },
+    { row: 2, campaign_type: 'Special', brand: 'VIVO', mat_code: '3000111880', display_name: '3000111880 H/S,VIVO,V40,12+256,5G,Silver', quota: 8, service_code: 'service code ของค้ำมัดจำ', deposit_amount: 535, channel: 'WW', booking_start: '10/07/2025 00:00', booking_end: '12/07/2025 23:59', pickup_start: '', pickup_message: '', valid: true, error: '' },
+    { row: 3, campaign_type: 'Special', brand: 'VIVO', mat_code: '3000111882', display_name: '3000111880 H/S,VIVO,V40,12+256,5G,white', quota: 10, service_code: 'service code ของค้ำมัดจำ', deposit_amount: 535, channel: 'WW', booking_start: '10/07/2025 00:00', booking_end: '12/07/2025 23:59', pickup_start: '', pickup_message: '', valid: true, error: '' },
+    { row: 4, campaign_type: 'Special', brand: 'VIVO', mat_code: '', display_name: '3000111880 H/S,VIVO,V40,12+256,5G,red', quota: 10, service_code: 'service code ของค้ำมัดจำ', deposit_amount: 535, channel: 'WW', booking_start: '', booking_end: '', pickup_start: '', pickup_message: '', valid: false, error: 'mat_code ว่าง' },
   ],
 })
 
@@ -131,12 +131,18 @@ const downloadTemplate = async () => {
 
 const previewColumns = computed(() => [
   { key: 'row', label: 'Row' },
+  { key: 'campaign_type', label: t('import.quota.preview.col.campaignType') },
+  { key: 'brand', label: t('import.quota.preview.col.brand') },
   { key: 'mat_code', label: t('import.quota.preview.col.matCode') },
-  { key: 'product_name', label: t('import.quota.preview.col.productName') },
-  { key: 'color', label: t('import.quota.preview.col.color') },
-  { key: 'storage', label: t('import.quota.preview.col.storage') },
-  { key: 'branch_code', label: t('import.quota.preview.col.branchCode') },
+  { key: 'display_name', label: t('import.quota.preview.col.displayName') },
   { key: 'quota', label: t('import.quota.preview.col.quota') },
+  { key: 'service_code', label: t('import.quota.preview.col.serviceCode') },
+  { key: 'deposit_amount', label: t('import.quota.preview.col.depositAmount') },
+  { key: 'channel', label: t('import.quota.preview.col.channel') },
+  { key: 'booking_start', label: t('import.quota.preview.col.bookingStart') },
+  { key: 'booking_end', label: t('import.quota.preview.col.bookingEnd') },
+  { key: 'pickup_start', label: t('import.quota.preview.col.pickupStart') },
+  { key: 'pickup_message', label: t('import.quota.preview.col.pickupMessage') },
   { key: 'valid', label: t('import.preview.col.status') },
   { key: 'error', label: t('import.preview.col.remark') },
 ])
@@ -163,7 +169,7 @@ const fileSizeLabel = computed(() => {
             </div>
             <!-- Column count badge -->
             <div class="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-white ring-2 ring-indigo-100 dark:bg-slate-900 dark:ring-indigo-500/30">
-              <span class="text-[9px] font-bold text-indigo-700 dark:text-indigo-400">6</span>
+              <span class="text-[9px] font-bold text-indigo-700 dark:text-indigo-400">{{ previewColumns.length - 3 }}</span>
             </div>
           </div>
           <div>
@@ -344,12 +350,18 @@ const fileSizeLabel = computed(() => {
           <TableBody>
             <TableRow v-for="(row, idx) in previewData.sampleRows" :key="idx">
               <TableCell><span class="font-mono text-xs text-slate-400">{{ row.row }}</span></TableCell>
+              <TableCell>{{ row.campaign_type }}</TableCell>
+              <TableCell>{{ row.brand }}</TableCell>
               <TableCell>{{ row.mat_code }}</TableCell>
-              <TableCell>{{ row.product_name }}</TableCell>
-              <TableCell>{{ row.color }}</TableCell>
-              <TableCell>{{ row.storage }}</TableCell>
-              <TableCell>{{ row.branch_code }}</TableCell>
+              <TableCell class="max-w-48 truncate">{{ row.display_name }}</TableCell>
               <TableCell>{{ row.quota }}</TableCell>
+              <TableCell>{{ row.service_code }}</TableCell>
+              <TableCell>{{ row.deposit_amount || '—' }}</TableCell>
+              <TableCell>{{ row.channel }}</TableCell>
+              <TableCell class="whitespace-nowrap">{{ row.booking_start || '—' }}</TableCell>
+              <TableCell class="whitespace-nowrap">{{ row.booking_end || '—' }}</TableCell>
+              <TableCell class="whitespace-nowrap">{{ row.pickup_start || '—' }}</TableCell>
+              <TableCell class="max-w-32 truncate">{{ row.pickup_message || '—' }}</TableCell>
               <TableCell>
                 <span
                   class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"

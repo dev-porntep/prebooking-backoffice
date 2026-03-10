@@ -115,12 +115,18 @@
       "downloadTemplate": "Download Quota Template",
       "preview": {
         "col": {
-          "matCode": "Mat Code",
-          "productName": "Product Name",
-          "color": "Color",
-          "storage": "Storage",
-          "branchCode": "Branch Code",
-          "quota": "Quota"
+          "campaignType": "Type",
+          "brand": "Brand",
+          "matCode": "Mat Code/SKU",
+          "displayName": "Display Name",
+          "quota": "Quota",
+          "serviceCode": "Service Code",
+          "depositAmount": "Deposit (฿)",
+          "channel": "Channel",
+          "bookingStart": "Booking Start",
+          "bookingEnd": "Booking End",
+          "pickupStart": "Pickup Start",
+          "pickupMessage": "Pickup Message"
         }
       }
     },
@@ -195,35 +201,16 @@
   },
   "export": {
     "title": "Export Prebooking Data",
-    "subtitle": "Export Prebooking data to Excel file",
-    "condition": "Set Export Conditions",
-    "conditionDesc": "Select filters or leave blank to export all",
-    "quickDate": "Quick Range",
-    "today": "Today",
-    "last7": "Last 7 Days",
-    "last30": "Last 30 Days",
-    "last90": "Last 90 Days",
-    "dateFrom": "Start Date",
-    "dateTo": "End Date",
-    "status": "Status",
-    "device": "Device Model",
-    "branch": "Branch",
-    "devicePlaceholder": "e.g. iPhone 16 Pro",
-    "branchPlaceholder": "e.g. Central Branch",
-    "reset": "Reset Conditions",
-    "activeFilter": "Filters applied",
-    "start": "Export to Excel",
-    "generating": "Generating Excel file...",
-    "history": {
-      "title": "Export History",
-      "subtitle": "Recent exports",
-      "items": "items",
-      "rows": "rows",
-      "colDate": "Export Date",
-      "colFilter": "Conditions",
-      "colRows": "Count",
-      "download": "Download"
-    }
+    "subtitle": "Export all Prebooking data to Excel or CSV file",
+    "format": "Select File Format",
+    "formatExcel": "Excel (.xlsx)",
+    "formatExcelDesc": "Compatible with Microsoft Excel, Google Sheets",
+    "formatCsv": "CSV",
+    "formatCsvDesc": "Universal format, smaller file size",
+    "exportAll": "Export All Data",
+    "exportAllDesc": "Export all Prebooking data as {format} file",
+    "start": "Export",
+    "generating": "Generating {format} file..."
   },
   "login": {
     "title": "Sign In",
