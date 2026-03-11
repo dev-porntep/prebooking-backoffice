@@ -1,0 +1,43 @@
+# docker-compose.prod.yml — Production simulation (local)
+# Usage: docker compose -f docker-compose.prod.yml up
+#
+# All required secrets must be provided via environment variables or a .env file.
+# Variables marked with :? will cause an immediate failure if not set — this is intentional.
+# NEVER commit a .env file containing real secrets.
+services:
+  app:
+    build:
+      context: .
+      target: runtime       # Full multi-stage build through to the lean runtime image
+      args:
+        BUILDKIT_INLINE_CACHE: "1"
+    image: prebooking-backoffice:prod-local
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      LOG_TO_FILE: "false"
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_CHANNEL: ${LOG_CHANNEL:-prebooking-backoffice}
+      LOG_PRODUCT: ${LOG_PRODUCT:-backoffice}
+      LOG_SERVICE_NAME: ${LOG_SERVICE_NAME:-prebooking-backoffice}
+      NUXT_APP_BASE_URL: ${NUXT_APP_BASE_URL:-/}
+      # Required — will fail fast with a clear message if missing
+      BACKEND_API_URL: ${BACKEND_API_URL:?BACKEND_API_URL is required}
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?NUXT_SESSION_PASSWORD is required (min 32 chars)}
+      NUXT_OAUTH_GOOGLE_CLIENT_ID: ${NUXT_OAUTH_GOOGLE_CLIENT_ID:?NUXT_OAUTH_GOOGLE_CLIENT_ID is required}
+      NUXT_OAUTH_GOOGLE_CLIENT_SECRET: ${NUXT_OAUTH_GOOGLE_CLIENT_SECRET:?NUXT_OAUTH_GOOGLE_CLIENT_SECRET is required}
+      NUXT_PUBLIC_AUTH_ENABLED: ${NUXT_PUBLIC_AUTH_ENABLED:-true}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    # Harden the runtime: read-only filesystem with tmpfs for /tmp only
+    read_only: true
+    tmpfs:
+      - /tmp

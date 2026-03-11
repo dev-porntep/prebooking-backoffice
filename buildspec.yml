@@ -1,0 +1,77 @@
+# buildspec.yml — AWS CodeBuild specification
+# Builds the Docker image and pushes it to Amazon ECR.
+#
+# Required environment variables (set in CodeBuild project console or via SSM):
+#   AWS_ACCOUNT_ID      — e.g. 123456789012
+#   AWS_DEFAULT_REGION  — e.g. ap-southeast-1
+#   ECR_REPO_NAME       — e.g. prebooking-backoffice
+#
+# The CodeBuild service role must have the following ECR permissions:
+#   ecr:GetAuthorizationToken
+#   ecr:BatchCheckLayerAvailability
+#   ecr:GetDownloadUrlForLayer
+#   ecr:BatchGetImage
+#   ecr:InitiateLayerUpload
+#   ecr:UploadLayerPart
+#   ecr:CompleteLayerUpload
+#   ecr:PutImage
+version: 0.2
+
+env:
+  variables:
+    ECR_REPO_NAME: "prebooking-backoffice"
+  # Uncomment to pull secrets from SSM Parameter Store instead of plaintext:
+  # parameter-store:
+  #   NUXT_SESSION_PASSWORD: /prebooking/prod/NUXT_SESSION_PASSWORD
+
+phases:
+  install:
+    commands:
+      # Enable BuildKit for cache mount support in Dockerfile
+      - export DOCKER_BUILDKIT=1
+
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR ($AWS_DEFAULT_REGION)"
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION |
+          docker login --username AWS --password-stdin
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - ECR_REGISTRY=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - IMAGE_URI=$ECR_REGISTRY/$ECR_REPO_NAME
+      # CODEBUILD_BUILD_NUMBER is a monotonically increasing integer — immutable tag
+      - IMAGE_TAG=${CODEBUILD_BUILD_NUMBER:-latest}
+      - echo "Tagging as $IMAGE_URI:$IMAGE_TAG and $IMAGE_URI:latest"
+
+  build:
+    commands:
+      - echo "Build started at $(date)"
+      - |
+        docker build \
+          --progress=plain \
+          --cache-from $IMAGE_URI:latest \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
+          --target runtime \
+          -t $IMAGE_URI:$IMAGE_TAG \
+          -t $IMAGE_URI:latest \
+          .
+      - echo "Build completed at $(date)"
+
+  post_build:
+    commands:
+      - echo "Pushing $IMAGE_URI:$IMAGE_TAG"
+      - docker push $IMAGE_URI:$IMAGE_TAG
+      - docker push $IMAGE_URI:latest
+      # imagedefinitions.json is consumed by ECS rolling / blue-green deployments
+      - |
+        echo "[{\"name\":\"prebooking-backoffice\",\"imageUri\":\"$IMAGE_URI:$IMAGE_TAG\"}]" \
+          > imagedefinitions.json
+      - echo "Done at $(date)"
+
+artifacts:
+  files:
+    - imagedefinitions.json
+
+cache:
+  paths:
+    # Persist Docker layer cache between builds for faster subsequent runs
+    - /root/.docker/**/*

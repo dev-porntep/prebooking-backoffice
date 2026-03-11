@@ -20,6 +20,28 @@ export interface LogEntry {
 }
 
 const PAGE_SIZE = 50
+const MAX_FIELD_LENGTH = 2_000 // chars per large string field
+
+const truncateLargeFields = (entry: LogEntry): LogEntry => {
+  const result = { ...entry } as Record<string, any>
+  for (const key in result) {
+    if (typeof result[key] === 'string') {
+      if (result[key].length > MAX_FIELD_LENGTH) {
+        result[key] = `${result[key].slice(0, MAX_FIELD_LENGTH)}…[truncated]`
+      }
+    } else if (typeof result[key] === 'object' && result[key] !== null) {
+      try {
+        const str = JSON.stringify(result[key])
+        if (str.length > MAX_FIELD_LENGTH) {
+          result[key] = `${str.slice(0, MAX_FIELD_LENGTH)}…[truncated JSON]`
+        }
+      } catch {
+        result[key] = '[truncated object]'
+      }
+    }
+  }
+  return result as LogEntry
+}
 
 const readLines = (filePath: string): Promise<string[]> =>
   new Promise((resolve, reject) => {
@@ -95,7 +117,7 @@ export default defineEventHandler(async (event) => {
   const total      = entries.length
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const offset     = (page - 1) * PAGE_SIZE
-  const data       = entries.slice(offset, offset + PAGE_SIZE)
+  const data       = entries.slice(offset, offset + PAGE_SIZE).map(truncateLargeFields)
 
   return { data, total, page, totalPages, pageSize: PAGE_SIZE }
 })

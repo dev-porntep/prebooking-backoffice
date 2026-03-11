@@ -1,0 +1,40 @@
+# docker-compose.yml — Development with hot reload
+# Usage: docker compose up
+#
+# Source is bind-mounted so changes hot-reload without rebuilding the image.
+# The backend is assumed to run on your host at port 8080.
+services:
+  app:
+    build:
+      context: .
+      target: deps          # Only install deps; source code is bind-mounted below
+    image: prebooking-backoffice:dev
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # Bind-mount source for hot reload
+      - .:/app
+      # Isolate node_modules so the host folder does not override the container's
+      - node_modules_dev:/app/node_modules
+    environment:
+      NODE_ENV: development
+      HOST: 0.0.0.0
+      PORT: 3000
+      LOG_TO_FILE: "false"
+      LOG_LEVEL: debug
+      NUXT_APP_BASE_URL: /
+      # Reach the host machine's backend from inside the container
+      BACKEND_API_URL: ${BACKEND_API_URL:-http://host.docker.internal:8080}
+      # Auth disabled by default in dev — override in your .env if needed
+      NUXT_PUBLIC_AUTH_ENABLED: ${NUXT_PUBLIC_AUTH_ENABLED:-false}
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:-dev-only-password-32-chars-long!!}
+      NUXT_OAUTH_GOOGLE_CLIENT_ID: ${NUXT_OAUTH_GOOGLE_CLIENT_ID:-}
+      NUXT_OAUTH_GOOGLE_CLIENT_SECRET: ${NUXT_OAUTH_GOOGLE_CLIENT_SECRET:-}
+    # Allow Linux hosts to resolve host.docker.internal (no-op on macOS/Windows)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+volumes:
+  node_modules_dev:

@@ -1,0 +1,47 @@
+# ── Nuxt build artifacts (rebuilt inside Docker) ──────────────────────────────
+.output
+.nuxt
+.nitro
+.cache
+.data
+dist
+
+# ── Node dependencies (reinstalled inside Docker) ─────────────────────────────
+node_modules
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+logs
+*.log
+
+# ── Environment and secrets ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Editor / OS files ─────────────────────────────────────────────────────────
+.vscode
+.idea
+.fleet
+.DS_Store
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+.git
+.gitignore
+.github
+
+# ── CI / agent files ──────────────────────────────────────────────────────────
+.agent
+.agent.log
+.agents
+.claude
+
+# ── Test artifacts ────────────────────────────────────────────────────────────
+coverage
+*.test.ts
+*.spec.ts
+__tests__
+
+# ── Docs ──────────────────────────────────────────────────────────────────────
+README.md
+CLAUDE.md
+docs

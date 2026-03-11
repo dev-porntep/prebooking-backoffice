@@ -2,58 +2,66 @@
 defineEmits(['close'])
 const { t } = useI18n()
 const route = useRoute()
+const config = useRuntimeConfig()
 
 type NavChild = { label: string; sublabel: string; icon: string; to: string }
 type NavItem =
   | { label: string; sublabel: string; icon: string; to: string; children?: never }
   | { label: string; sublabel: string; icon: string; to?: never; children: NavChild[] }
 
-const navigation = computed((): NavItem[] => [
-  // TODO: เปิดใช้เมื่อ Dashboard พร้อม
-  // {
-  //   label: t('nav.dashboard.label'),
-  //   sublabel: t('nav.dashboard.sublabel'),
-  //   icon: 'i-lucide-layout-dashboard',
-  //   to: '/',
-  // },
-  {
-    label: t('nav.import.label'),
-    sublabel: t('nav.import.sublabel'),
-    icon: 'i-lucide-upload',
-    children: [
-      {
-        label: t('nav.import.quota.label'),
-        sublabel: t('nav.import.quota.sublabel'),
-        icon: 'i-lucide-package',
-        to: '/import/quota',
-      },
-      {
-        label: t('nav.import.dates.label'),
-        sublabel: t('nav.import.dates.sublabel'),
-        icon: 'i-lucide-calendar-days',
-        to: '/import/dates',
-      },
-      {
-        label: t('nav.import.timeslots.label'),
-        sublabel: t('nav.import.timeslots.sublabel'),
-        icon: 'i-lucide-clock',
-        to: '/import/timeslots',
-      },
-    ],
-  },
-  {
-    label: t('nav.export.label'),
-    sublabel: t('nav.export.sublabel'),
-    icon: 'i-lucide-download',
-    to: '/export',
-  },
-  {
-    label: t('nav.logs.label'),
-    sublabel: t('nav.logs.sublabel'),
-    icon: 'i-lucide-file-text',
-    to: '/logs',
-  },
-])
+const navigation = computed((): NavItem[] => {
+  const items: NavItem[] = [
+    // TODO: เปิดใช้เมื่อ Dashboard พร้อม
+    // {
+    //   label: t('nav.dashboard.label'),
+    //   sublabel: t('nav.dashboard.sublabel'),
+    //   icon: 'i-lucide-layout-dashboard',
+    //   to: '/',
+    // },
+    {
+      label: t('nav.import.label'),
+      sublabel: t('nav.import.sublabel'),
+      icon: 'i-lucide-upload',
+      children: [
+        {
+          label: t('nav.import.quota.label'),
+          sublabel: t('nav.import.quota.sublabel'),
+          icon: 'i-lucide-package',
+          to: '/import/quota',
+        },
+        {
+          label: t('nav.import.dates.label'),
+          sublabel: t('nav.import.dates.sublabel'),
+          icon: 'i-lucide-calendar-days',
+          to: '/import/dates',
+        },
+        {
+          label: t('nav.import.timeslots.label'),
+          sublabel: t('nav.import.timeslots.sublabel'),
+          icon: 'i-lucide-clock',
+          to: '/import/timeslots',
+        },
+      ],
+    },
+    {
+      label: t('nav.export.label'),
+      sublabel: t('nav.export.sublabel'),
+      icon: 'i-lucide-download',
+      to: '/export',
+    },
+  ]
+
+  if (config.public.logToFile) {
+    items.push({
+      label: t('nav.logs.label'),
+      sublabel: t('nav.logs.sublabel'),
+      icon: 'i-lucide-file-text',
+      to: '/logs',
+    })
+  }
+
+  return items
+})
 
 const isActive = (path: string) => route.path === path
 
