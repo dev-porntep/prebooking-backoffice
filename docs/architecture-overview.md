@@ -407,7 +407,7 @@ NUXT_PUBLIC_AUTH_ENABLED=true                # false สำหรับ static b
 |--------|--------|--------|
 | **Job manager = in-memory** | Restart server แล้ว job ที่กำลัง process หาย | ย้ายไป Redis / database |
 | **Mock API ทั้งหมด** | ยังใช้งานจริงไม่ได้ | ต่อ backendFetch() เมื่อ backend พร้อม |
-| **ไม่มี test framework** | ไม่มี test coverage | เพิ่ม Vitest + Playwright |
+| **ไม่มี test framework** | ไม่มี test coverage | เพิ่ม Vitest + Playwright (unit tests ใน `tests/unit/`, E2E tests ใน `tests/e2e/`) |
 | **Nuxt 4 ใหม่มาก** | Community resource น้อยกว่า v3 | ดู official docs + migration guide |
 | **SSO direct redirect** | ถ้า OAuth error จะ loop กลับ Google | error ปัจจุบัน retry /auth/google |
 
@@ -439,14 +439,17 @@ NUXT_PUBLIC_AUTH_ENABLED=true                # false สำหรับ static b
 - [x] `.env.example` ด้วย env vars ที่ถูกต้อง
 
 ### Pending
-- [ ] **ต่อ backend API จริง** — แทน mock responses ทุก route ด้วย `backendFetch()`
+- [ ] **ต่อ backend API จริง** — เริ่มจาก endpoints สำคัญ: `/api/prebooking`, `/api/import`, `/api/export` (แทน mock responses ทุก route ด้วย `backendFetch()`)
 - [ ] **Job persistence** — ย้าย `jobManager.ts` จาก in-memory Map → Redis / DB
 - [ ] **Test framework** — เพิ่ม Vitest (unit) + Playwright (E2E)
-- [ ] **Export polling** — เพิ่ม status endpoint สำหรับ export job
+- [ ] **Export polling** — เพิ่ม status endpoint สำหรับ export job (server) และเพิ่ม client polling logic
 - [ ] **Multipart upload** — ทำ real streaming upload แทน mock
 - [ ] **Error monitoring** — เพิ่ม Sentry หรือ equivalent
 - [ ] **Rate limiting** — เพิ่มบน `/api/import/upload`
-- [ ] **OAuth error page** — แสดง error message แทน retry loop เมื่อ Google OAuth fail
+- [ ] **OAuth error page** — แสดง error message แทน retry loop เมื่อ Google OAuth fail  
+      - ควร redirect ไปหน้า `/auth/error` เมื่อเกิด OAuth error  
+      - หน้า error ควรแสดงข้อความที่ user-friendly, มีปุ่ม retry และ support contact  
+      - ใช้ layout เดียวกับ default, แต่เน้น error state (icon + สีแดง)
 
 ---
 
