@@ -55,12 +55,6 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     backendApiUrl: process.env['BACKEND_API_URL'] || 'http://localhost:8080',
-    sso: {
-      clientId: process.env['SSO_CLIENT_ID'],
-      clientSecret: process.env['SSO_CLIENT_SECRET'],
-      issuer: process.env['SSO_ISSUER_URL'],
-      redirectUri: process.env['SSO_REDIRECT_URI'],
-    },
     session: {
       maxAge: 60 * 60 * 24,
       password: process.env['NUXT_SESSION_PASSWORD'] || 'default-password-must-be-at-least-32-chars',
@@ -95,8 +89,7 @@ export default defineNuxtConfig({
   },
 
   vite: {
-    plugins: [
-      tailwindcss(),
-    ],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    plugins: [tailwindcss() as any],
   },
 })
