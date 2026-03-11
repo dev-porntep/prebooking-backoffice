@@ -9,8 +9,8 @@ dist
 # Node dependencies
 node_modules
 
-# Logs
-logs
+# Logs (root-level log output directory only, not server/api/logs/)
+/logs
 *.log
 
 # Misc
@@ -27,4 +27,5 @@ logs
 .agent
 .agent.log
 .agents/skills
+.claude/skills
 CLAUDE.md
