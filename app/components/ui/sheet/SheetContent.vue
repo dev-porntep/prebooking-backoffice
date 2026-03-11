@@ -17,14 +17,16 @@ interface SheetContentProps extends DialogContentProps {
   side?: "top" | "right" | "bottom" | "left"
 }
 
+const props = withDefaults(defineProps<SheetContentProps>(), {
+  side: "right",
+  class: undefined,
+})
+
+const emits = defineEmits<DialogContentEmits>()
+
 defineOptions({
   inheritAttrs: false,
 })
-
-const props = withDefaults(defineProps<SheetContentProps>(), {
-  side: "right",
-})
-const emits = defineEmits<DialogContentEmits>()
 
 const delegatedProps = reactiveOmit(props, "class", "side")
 

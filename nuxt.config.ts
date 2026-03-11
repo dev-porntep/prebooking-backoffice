@@ -55,6 +55,14 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     backendApiUrl: process.env['BACKEND_API_URL'] || 'http://localhost:8080',
+    logging: {
+      logPath:     process.env['LOG_PATH']         || 'logs/app',
+      logToFile:   process.env['LOG_TO_FILE']       !== 'false',
+      logLevel:    process.env['LOG_LEVEL']         || 'info',
+      logChannel:  process.env['LOG_CHANNEL']       || 'prebooking-backoffice',
+      logProduct:  process.env['LOG_PRODUCT']       || 'backoffice',
+      serviceName: process.env['LOG_SERVICE_NAME']  || 'prebooking-backoffice',
+    },
     session: {
       maxAge: 60 * 60 * 24,
       password: process.env['NUXT_SESSION_PASSWORD'] || 'default-password-must-be-at-least-32-chars',

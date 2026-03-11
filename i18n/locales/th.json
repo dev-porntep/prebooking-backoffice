@@ -13,7 +13,8 @@
       "dates": { "label": "ตารางวันจอง-รับ", "sublabel": "วันจอง → วันรับสินค้า" },
       "timeslots": { "label": "ช่วงเวลารับสินค้า", "sublabel": "เวลาที่สามารถรับเครื่องได้" }
     },
-    "export": { "label": "Export Excel", "sublabel": "ส่งออกข้อมูล" }
+    "export": { "label": "Export Excel", "sublabel": "ส่งออกข้อมูล" },
+    "logs": { "label": "Server Logs", "sublabel": "ดู Log ของเซิร์ฟเวอร์" }
   },
   "system": {
     "online": "ระบบออนไลน์"
@@ -223,6 +224,32 @@
       "desc": "ติดต่อ IT Support หากมีปัญหาในการเข้าสู่ระบบ"
     },
     "footer": "ระบบนี้สำหรับพนักงานที่ได้รับอนุญาตเท่านั้น"
+  },
+  "logs": {
+    "title": "Server Logs",
+    "subtitle": "ดู Request/Response Log ของ API ทั้งหมด",
+    "file": "ไฟล์ Log",
+    "level": "ระดับ",
+    "search": "ค้นหา",
+    "searchPlaceholder": "endpoint, txid, step name...",
+    "noFiles": "ไม่พบไฟล์ Log",
+    "noFilesHint": "ตั้งค่า LOG_TO_FILE=true และรีสตาร์ทเซิร์ฟเวอร์",
+    "noEntries": "ไม่พบ Log ที่ตรงกับเงื่อนไข",
+    "found": "พบ {n} รายการ",
+    "page": "หน้า {page} / {total}",
+    "col": {
+      "time": "เวลา",
+      "level": "Level",
+      "method": "Method",
+      "endpoint": "Endpoint / Step",
+      "status": "Status",
+      "elapsed": "เวลา (ms)"
+    },
+    "detail": {
+      "request": "Request",
+      "response": "Response",
+      "raw": "Raw JSON"
+    }
   },
   "toast": {
     "login": {

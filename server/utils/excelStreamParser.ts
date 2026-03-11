@@ -1,10 +1,14 @@
 import ExcelJS from 'exceljs'
 
+interface WorksheetWithName {
+  name: string
+}
+
 interface ParseOptions {
   stream: NodeJS.ReadableStream
   sheetName?: string
   previewOnly?: boolean
-  onRow?: (row: Record<string, any>, index: number) => void
+  onRow?: (row: Record<string, unknown>, index: number) => void
 }
 
 export const streamParseExcel = async (options: ParseOptions) => {
@@ -18,22 +22,22 @@ export const streamParseExcel = async (options: ParseOptions) => {
 
   let headers: string[] = []
   let rowCount = 0
-  const sampleRows: any[] = []
+  const sampleRows: Record<string, unknown>[] = []
 
   for await (const worksheet of workbook) {
-    if ((worksheet as any).name !== sheetName) continue
+    if ((worksheet as unknown as WorksheetWithName).name !== sheetName) continue
 
     for await (const row of worksheet) {
       const values = Array.isArray(row.values) ? row.values.slice(1) : []
 
       if (row.number === 1) {
-        headers = values.map((v: any) => String(v).trim())
+        headers = values.map((v: unknown) => String(v).trim())
         continue
       }
 
       rowCount++
 
-      const rowData: Record<string, any> = {}
+      const rowData: Record<string, unknown> = {}
       headers.forEach((h, i) => {
         rowData[h] = values[i]
       })

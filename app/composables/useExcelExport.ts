@@ -8,13 +8,13 @@ export const useExcelExport = () => {
   const startExport = async (filter: ExportFilter) => {
     isExporting.value = true
     error.value = null
-    
+
     try {
       const response = await $fetch<{ jobId: string }>('/api/export/generate', {
         method: 'POST',
         body: filter
       })
-      
+
       currentJob.value = {
         id: response.jobId,
         status: 'processing',
@@ -23,21 +23,21 @@ export const useExcelExport = () => {
         totalRows: 0,
         createdAt: new Date().toISOString()
       }
-      
+
       pollStatus()
-    } catch (err: any) {
-      error.value = err.message || 'Failed to start export'
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Failed to start export'
       isExporting.value = false
     }
   }
 
   const pollStatus = async () => {
     if (!currentJob.value) return
-    
+
     try {
       const status = await $fetch<ExportJob>(`/api/export/status/${currentJob.value.id}`)
       currentJob.value = status
-      
+
       if (status.status === 'processing' || status.status === 'pending') {
         setTimeout(pollStatus, 2000)
       } else {
@@ -46,8 +46,8 @@ export const useExcelExport = () => {
           downloadFile(status.downloadUrl)
         }
       }
-    } catch (err: any) {
-      error.value = err.message || 'Failed to get export status'
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Failed to get export status'
       isExporting.value = false
     }
   }

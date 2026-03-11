@@ -1,3 +1,4 @@
+import { $fetch as apiFetch } from 'ofetch'
 import { storeToRefs } from 'pinia'
 import { usePrebookingStore } from '~/stores/prebookingStore'
 import type { PrebookingFilter } from '~/types/prebooking'
@@ -19,9 +20,9 @@ export const usePrebooking = () => {
 
   const deletePrebooking = async (id: string) => {
     try {
-      await $fetch(`/api/prebooking/${id}`, { method: 'DELETE' } as any)
+      await apiFetch(`/api/prebooking/${id}`, { method: 'DELETE' })
       refresh()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to delete prebooking', err)
       throw err
     }
@@ -29,12 +30,12 @@ export const usePrebooking = () => {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      await $fetch(`/api/prebooking/${id}`, { 
+      await apiFetch(`/api/prebooking/${id}`, {
         method: 'PUT',
         body: { status }
-      } as any)
+      })
       refresh()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(`Failed to update prebooking status to ${status}`, err)
       throw err
     }
@@ -50,7 +51,7 @@ export const usePrebooking = () => {
     stats,
     isLoading,
     error,
-    
+
     // Actions
     fetchPrebookings,
     refresh,

@@ -9,6 +9,7 @@ const props = withDefaults(defineProps<{
   showCloseButton?: boolean
 }>(), {
   showCloseButton: false,
+  class: undefined,
 })
 </script>
 

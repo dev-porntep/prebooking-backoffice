@@ -1,21 +1,37 @@
+import { randomUUID } from 'node:crypto'
+
 import type { H3Event } from 'h3'
 
-const config = useRuntimeConfig()
+import { HttpClientBase } from '../services/http-client-base'
+
+// Create a new client per request so each call gets its own log context (via interceptors)
+const createClient = (): HttpClientBase => {
+  const { backendApiUrl } = useRuntimeConfig()
+  return new HttpClientBase(backendApiUrl as string)
+}
 
 export const backendFetch = async <T>(
   event: H3Event,
   path: string,
   options?: { method?: string; body?: unknown; query?: Record<string, unknown> },
 ): Promise<T> => {
-  const token = event.context['auth']?.token
+  const client = createClient()
+  const token  = event.context['auth']?.token as string | undefined
+  const txid   = (event.context['txid'] as string | undefined) ?? randomUUID()
+  const method = ((options?.method ?? 'GET') as string).toLowerCase() as 'get' | 'post' | 'put' | 'patch' | 'delete'
 
-  return await ($fetch as any)(`${config.backendApiUrl}${path}`, {
-    method: (options?.method || 'GET') as 'GET' | 'POST' | 'PUT' | 'DELETE',
-    body: options?.body ? JSON.stringify(options.body) : undefined,
-    query: options?.query,
+  const axiosConfig = {
+    params: options?.query,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type':    'application/json',
+      'x-correlator-id': txid,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-  })
+  }
+
+  const response = (method === 'get' || method === 'delete')
+    ? await client[method]<T>(path, undefined, axiosConfig)
+    : await client[method]<T>(path, options?.body, axiosConfig)
+
+  return response.data
 }

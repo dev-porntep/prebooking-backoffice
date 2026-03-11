@@ -13,7 +13,8 @@
       "dates": { "label": "Booking Dates", "sublabel": "Prebooking → Pickup Date Map" },
       "timeslots": { "label": "Pickup Time Slots", "sublabel": "Available pickup hours" }
     },
-    "export": { "label": "Export Excel", "sublabel": "Export Data" }
+    "export": { "label": "Export Excel", "sublabel": "Export Data" },
+    "logs": { "label": "Server Logs", "sublabel": "View server request logs" }
   },
   "system": {
     "online": "System Online"
@@ -223,6 +224,32 @@
       "desc": "Contact IT Support if you have login issues"
     },
     "footer": "This system is for authorized personnel only"
+  },
+  "logs": {
+    "title": "Server Logs",
+    "subtitle": "View API request and response logs",
+    "file": "Log File",
+    "level": "Level",
+    "search": "Search",
+    "searchPlaceholder": "endpoint, txid, step name...",
+    "noFiles": "No log files found",
+    "noFilesHint": "Set LOG_TO_FILE=true and restart the server",
+    "noEntries": "No entries match your filter",
+    "found": "{n} entries found",
+    "page": "Page {page} of {total}",
+    "col": {
+      "time": "Time",
+      "level": "Level",
+      "method": "Method",
+      "endpoint": "Endpoint / Step",
+      "status": "Status",
+      "elapsed": "Elapsed"
+    },
+    "detail": {
+      "request": "Request",
+      "response": "Response",
+      "raw": "Raw JSON"
+    }
   },
   "toast": {
     "login": {

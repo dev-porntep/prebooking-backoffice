@@ -3,7 +3,7 @@ import { PassThrough } from 'node:stream'
 
 interface GenerateOptions {
   headers: string[]
-  dataFetcher: (page: number, limit: number) => Promise<any[]>
+  dataFetcher: (page: number, limit: number) => Promise<Record<string, unknown>[]>
   onProgress?: (processed: number) => void
 }
 
@@ -35,7 +35,7 @@ export const streamGenerateExcel = async (options: GenerateOptions) => {
 
     totalProcessed += data.length
     if (onProgress) onProgress(totalProcessed)
-        
+
     page++
   }
 

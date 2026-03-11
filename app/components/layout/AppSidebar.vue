@@ -1,8 +1,7 @@
 <script setup lang="ts">
+defineEmits(['close'])
 const { t } = useI18n()
 const route = useRoute()
-
-defineEmits(['close'])
 
 type NavChild = { label: string; sublabel: string; icon: string; to: string }
 type NavItem =
@@ -47,6 +46,12 @@ const navigation = computed((): NavItem[] => [
     sublabel: t('nav.export.sublabel'),
     icon: 'i-lucide-download',
     to: '/export',
+  },
+  {
+    label: t('nav.logs.label'),
+    sublabel: t('nav.logs.sublabel'),
+    icon: 'i-lucide-file-text',
+    to: '/logs',
   },
 ])
 

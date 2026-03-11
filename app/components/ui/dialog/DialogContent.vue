@@ -12,14 +12,16 @@ import {
 import { cn } from "@/lib/utils"
 import DialogOverlay from "./DialogOverlay.vue"
 
+const props = withDefaults(defineProps<DialogContentProps & { class?: HTMLAttributes["class"], showCloseButton?: boolean }>(), {
+  showCloseButton: true,
+  class: undefined,
+})
+
+const emits = defineEmits<DialogContentEmits>()
+
 defineOptions({
   inheritAttrs: false,
 })
-
-const props = withDefaults(defineProps<DialogContentProps & { class?: HTMLAttributes["class"], showCloseButton?: boolean }>(), {
-  showCloseButton: true,
-})
-const emits = defineEmits<DialogContentEmits>()
 
 const delegatedProps = reactiveOmit(props, "class")
 
