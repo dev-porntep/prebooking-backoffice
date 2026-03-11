@@ -1,4 +1,4 @@
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware(() => {
   const { public: { authEnabled } } = useRuntimeConfig()
 
   // Skip auth on static builds (e.g. GitHub Pages preview)
@@ -6,9 +6,7 @@ export default defineNuxtRouteMiddleware((to) => {
 
   const { loggedIn } = useUserSession()
 
-  if (to.path === '/login') return
-
   if (!loggedIn.value) {
-    return navigateTo('/login')
+    return navigateTo('/auth/google', { external: true })
   }
 })

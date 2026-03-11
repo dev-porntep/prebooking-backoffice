@@ -1,7 +1,7 @@
 # Architecture Overview — Prebooking Backoffice
 
 > เอกสารสำหรับประชุม dev เพื่อทำความเข้าใจโครงสร้างระบบ
-> อัปเดตล่าสุด: 11 มีนาคม 2026
+> อัปเดตล่าสุด: 11 มีนาคม 2026 (rev 2 — SSO direct flow, Vercel deployment)
 
 ---
 
@@ -45,7 +45,6 @@ prebooking-backoffice/
 ├── app/                          ← Nuxt 4 source root (~/alias ชี้มาที่นี่)
 │   ├── pages/                    ← Route pages (file-based routing)
 │   │   ├── index.vue             ← Dashboard
-│   │   ├── login.vue             ← SSO login
 │   │   ├── display.vue           ← Prebooking detail
 │   │   ├── export.vue            ← Export Excel/CSV
 │   │   └── import/
@@ -54,8 +53,7 @@ prebooking-backoffice/
 │   │       └── timeslots.vue     ← Import pickup timeslots
 │   │
 │   ├── layouts/
-│   │   ├── default.vue           ← App shell (sidebar + header + breadcrumb)
-│   │   └── auth.vue              ← Split-screen login layout
+│   │   └── default.vue           ← App shell (sidebar + header + breadcrumb)
 │   │
 │   ├── components/
 │   │   ├── layout/               ← AppSidebar, AppHeader, AppBreadcrumb, LanguageSwitcher
@@ -105,7 +103,8 @@ prebooking-backoffice/
 │   ├── th.json                   ← Thai (default, 245 lines)
 │   └── en.json                   ← English (parallel structure)
 │
-├── public/fonts/BetterTogether/  ← Custom font (Regular, Medium, Bold)
+├── app/assets/fonts/BetterTogether/ ← Custom font (processed by Vite — base URL safe)
+├── public/fonts/BetterTogether/  ← Static font fallback (legacy)
 ├── nuxt.config.ts                ← Config ทั้งหมด
 ├── tsconfig.json                 ← TypeScript strict
 └── eslint.config.ts              ← Lint rules
@@ -273,43 +272,64 @@ Structure ของ locale keys:
 
 ## 6. Pages & Routing
 
-| Route | File | Layout | Auth |
-|-------|------|--------|------|
-| `/` | `pages/index.vue` | default | ✅ Protected |
-| `/login` | `pages/login.vue` | auth | Public |
-| `/display` | `pages/display.vue` | default | ✅ Protected |
-| `/export` | `pages/export.vue` | default | ✅ Protected |
-| `/import/quota` | `pages/import/quota.vue` | default | ✅ Protected |
-| `/import/dates` | `pages/import/dates.vue` | default | ✅ Protected |
-| `/import/timeslots` | `pages/import/timeslots.vue` | default | ✅ Protected |
+ทุก route ต้อง login — ไม่มีหน้า public
+
+| Route | File | Layout |
+|-------|------|--------|
+| `/` | `pages/index.vue` | default |
+| `/display` | `pages/display.vue` | default |
+| `/export` | `pages/export.vue` | default |
+| `/import/quota` | `pages/import/quota.vue` | default |
+| `/import/dates` | `pages/import/dates.vue` | default |
+| `/import/timeslots` | `pages/import/timeslots.vue` | default |
+
+**Server OAuth routes** (ไม่ใช่ Nuxt pages — Nitro handles โดยตรง):
+
+| Route | File | หน้าที่ |
+|-------|------|--------|
+| `/auth/google` | `server/routes/auth/google.get.ts` | เริ่ม/รับ Google OAuth callback |
+| `/auth/logout` | `server/routes/auth/logout.get.ts` | Clear session → redirect `/auth/google` |
 
 ---
 
 ## 7. Authentication Flow
 
+ไม่มีหน้า login — ผู้ใช้ที่ยังไม่ได้ login จะถูก redirect ไป Google OAuth ทันที
+
 ```
-Browser                    Nuxt Client           Nuxt Server
-   │                           │                      │
-   ├─ เข้า /dashboard ─────────►│                      │
-   │                    auth.global.ts                 │
-   │                    loggedIn? No                   │
-   │◄─ redirect /login ─────────┤                      │
-   │                           │                      │
-   ├─ คลิก Login SSO ───────────►│                      │
-   │                           ├─ GET /api/auth/sso ──►│
-   │◄─ redirect to SSO ─────────│◄─────────────────────┤
-   │                           │                      │
-   ├─ (SSO callback) ──────────────────────────────────►
-   │                           │         callback.get.ts
-   │                           │         createUserSession()
-   │◄─ redirect / ─────────────────────────────────────┤
+Browser                    Nuxt Client              Nitro Server
+   │                           │                         │
+   ├─ เข้า / ──────────────────►│                         │
+   │                    auth.global.ts                    │
+   │                    loggedIn? No                      │
+   │◄─ redirect /auth/google (external) ─────────────────┤
+   │                           │                         │
+   ├─ GET /auth/google ────────────────────────────────►  │
+   │                           │         google.get.ts   │
+   │                           │         redirect → Google│
+   │◄─ Google OAuth consent ───────────────────────────── │
+   │                           │                         │
+   ├─ Google callback → /auth/google?code=... ──────────►│
+   │                           │         setUserSession()│
+   │◄─ redirect / ─────────────────────────────────────── │
+   │                           │                         │
+   ├─ เข้า / ──────────────────►│                         │
+   │                    loggedIn? Yes → แสดงหน้า          │
+```
+
+**Logout flow:**
+```
+กด Logout → GET /auth/logout → clearUserSession() → redirect /auth/google → Google consent
 ```
 
 **Client guard** — [app/middleware/auth.global.ts](../app/middleware/auth.global.ts):
-ถ้า `!loggedIn.value` และไม่ใช่ `/login` → redirect ไป login
+ถ้า `!loggedIn.value` → `navigateTo('/auth/google', { external: true })`
 
 **Server guard** — [server/middleware/auth.ts](../server/middleware/auth.ts):
 ถ้าเรียก `/api/prebooking`, `/api/import`, `/api/export` โดยไม่มี session → HTTP 401
+
+**Static build** (`NUXT_PUBLIC_AUTH_ENABLED=false`):
+middleware return early — ไม่มี redirect ใดๆ (ใช้สำหรับ GitHub Pages preview)
 
 ---
 
@@ -318,9 +338,7 @@ Browser                    Nuxt Client           Nuxt Server
 **Layout Default** (`app/layouts/default.vue`):
 - Collapsible sidebar (left) + Header (top) + Breadcrumb + Main content
 - Responsive: sidebar เป็น overlay บน mobile
-
-**Layout Auth** (`app/layouts/auth.vue`):
-- Split-screen: Left panel (brand, red gradient) + Right panel (form)
+- Layout เดียวสำหรับทุกหน้า (ไม่มี auth layout แล้ว)
 
 **Component Library — Reka UI:**
 ทุก UI component เป็น headless (ไม่มี default style) styled ด้วย Tailwind
@@ -343,21 +361,28 @@ cn('px-4 py-2', isActive && 'bg-red-600', className)
 
 ```bash
 # Backend
-BACKEND_API_URL=http://localhost:8080     # URL external backend
+BACKEND_API_URL=http://localhost:8080        # URL external backend
 
-# SSO / OAuth
-SSO_CLIENT_ID=...
-SSO_CLIENT_SECRET=...
-SSO_ISSUER_URL=...
-SSO_REDIRECT_URI=...
+# Google OAuth — nuxt-auth-utils อ่านชื่อนี้โดยตรง
+# ตั้งค่าใน Google Console → Authorized redirect URI: https://<domain>/auth/google
+NUXT_OAUTH_GOOGLE_CLIENT_ID=...
+NUXT_OAUTH_GOOGLE_CLIENT_SECRET=...
 
-# Session
-NUXT_SESSION_PASSWORD=...                # ต้อง >= 32 chars
+# Session — encrypt cookie session
+NUXT_SESSION_PASSWORD=...                    # ต้อง >= 32 chars (openssl rand -base64 32)
 
 # Optional
-NUXT_APP_BASE_URL=/                      # Base path (default: /)
-NUXT_PUBLIC_AUTH_ENABLED=true            # ปิดได้สำหรับ static build
+NUXT_APP_BASE_URL=/                          # Base path (default: /)
+NUXT_PUBLIC_AUTH_ENABLED=true                # false สำหรับ static build (GitHub Pages)
 ```
+
+### Deployment targets
+
+| Platform | AUTH_ENABLED | APP_BASE_URL | build command |
+|----------|-------------|-------------|---------------|
+| **Vercel** | `true` | `/` | `nuxt build` |
+| **Railway / VPS** | `true` | `/` | `nuxt build` |
+| **GitHub Pages** (preview) | `false` | `/prebooking-backoffice/` | `nuxt generate` |
 
 ---
 
@@ -384,7 +409,7 @@ NUXT_PUBLIC_AUTH_ENABLED=true            # ปิดได้สำหรับ 
 | **Mock API ทั้งหมด** | ยังใช้งานจริงไม่ได้ | ต่อ backendFetch() เมื่อ backend พร้อม |
 | **ไม่มี test framework** | ไม่มี test coverage | เพิ่ม Vitest + Playwright |
 | **Nuxt 4 ใหม่มาก** | Community resource น้อยกว่า v3 | ดู official docs + migration guide |
-| **SSO setup ซับซ้อน** | ต้องตั้งค่า OAuth provider | ดู docs/sso-setup-guide.md |
+| **SSO direct redirect** | ถ้า OAuth error จะ loop กลับ Google | error ปัจจุบัน retry /auth/google |
 
 ### ความเหมาะสม
 
@@ -407,6 +432,13 @@ NUXT_PUBLIC_AUTH_ENABLED=true            # ปิดได้สำหรับ 
 
 ## 11. Roadmap (สิ่งที่ยังต้องทำก่อน Go-Live)
 
+### Done ✅
+- [x] Google SSO direct flow (ไม่มีหน้า login)
+- [x] Font ใช้ Vite asset pipeline (รองรับ base URL ทุก deployment)
+- [x] Vercel deployment workflow (`.github/workflows/deploy-vercel.yml`)
+- [x] `.env.example` ด้วย env vars ที่ถูกต้อง
+
+### Pending
 - [ ] **ต่อ backend API จริง** — แทน mock responses ทุก route ด้วย `backendFetch()`
 - [ ] **Job persistence** — ย้าย `jobManager.ts` จาก in-memory Map → Redis / DB
 - [ ] **Test framework** — เพิ่ม Vitest (unit) + Playwright (E2E)
@@ -414,6 +446,7 @@ NUXT_PUBLIC_AUTH_ENABLED=true            # ปิดได้สำหรับ 
 - [ ] **Multipart upload** — ทำ real streaming upload แทน mock
 - [ ] **Error monitoring** — เพิ่ม Sentry หรือ equivalent
 - [ ] **Rate limiting** — เพิ่มบน `/api/import/upload`
+- [ ] **OAuth error page** — แสดง error message แทน retry loop เมื่อ Google OAuth fail
 
 ---
 
@@ -427,5 +460,5 @@ NUXT_PUBLIC_AUTH_ENABLED=true            # ปิดได้สำหรับ 
 | เพิ่ม text / translation | `i18n/locales/th.json` + `en.json` |
 | เปลี่ยน config | `nuxt.config.ts` |
 | ดู type definitions | `app/types/` |
-| Auth flow | `app/middleware/auth.global.ts` + `server/middleware/auth.ts` |
+| Auth flow | `app/middleware/auth.global.ts` + `server/routes/auth/google.get.ts` |
 | Excel processing | `server/utils/excelStream*.ts` + `server/utils/chunkProcessor.ts` |
