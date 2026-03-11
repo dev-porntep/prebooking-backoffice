@@ -9,7 +9,7 @@ services:
       context: .
       target: deps          # Only install deps; source code is bind-mounted below
     image: prebooking-backoffice:dev
-    command: npm run dev
+    command: npm run dev:log
     ports:
       - "3000:3000"
     volumes:
