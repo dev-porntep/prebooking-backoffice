@@ -29,13 +29,13 @@ watch(() => route.path, () => {
       class="fixed inset-y-0 left-0 z-40 shrink-0 overflow-hidden transition-all duration-300 ease-in-out lg:static lg:w-[218px]"
       :class="isSidebarOpen ? 'translate-x-0 w-[218px]' : '-translate-x-full lg:translate-x-0'"
     >
-      <LayoutAppSidebar @close="isSidebarOpen = false" />
+      <AppSidebar @close="isSidebarOpen = false" />
     </div>
 
     <!-- Main area -->
     <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
       <!-- Mobile header -->
-      <LayoutAppHeader @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+      <AppHeader @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
       <!-- Page content -->
       <main ref="mainEl" class="flex-1 overflow-y-auto scroll-smooth">

@@ -19,12 +19,10 @@ export default defineNuxtConfig({
 
   components: {
     dirs: [
-      {
-        path: '~/components/ui',
-        extensions: ['.vue'],
-        pathPrefix: false,
-      },
-      '~/components',
+      { path: '~/components/settings', pathPrefix: false },
+      { path: '~/components/prebooking', pathPrefix: false },
+      { path: '~/components/layout', pathPrefix: false },
+      { path: '~/components/ui', pathPrefix: false },
     ],
   },
 
@@ -88,9 +86,8 @@ export default defineNuxtConfig({
 
   nitro: {
     routeRules: {
-      '/api/import/**': {
-        headers: { 'x-max-body-size': '50mb' },
-      },
+      '/api/import/**':   { headers: { 'x-max-body-size': '50mb' } },
+      '/api/settings/**': { headers: { 'x-max-body-size': '50mb' } },
     },
     experimental: {
       tasks: true,

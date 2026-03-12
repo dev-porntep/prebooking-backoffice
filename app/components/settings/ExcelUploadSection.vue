@@ -17,9 +17,9 @@ const props = defineProps<Props>()
 const { t } = useI18n()
 
 const selectedFile = ref<File | null>(null)
-const uploadedName = ref<string | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
-const isUploading = ref(false)
+
+const { isUploading, uploadedFilename: uploadedName, upload: doUpload } = useSettingsUpload(props.uploadApiPath)
 
 function onFileChange(e: Event): void {
   const input = e.target as HTMLInputElement
@@ -35,20 +35,14 @@ function onFileChange(e: Event): void {
 
 async function upload(): Promise<void> {
   if (!selectedFile.value) return
-  isUploading.value = true
-  try {
-    // TODO: connect to real API — props.uploadApiPath
-    await new Promise(r => setTimeout(r, 800))
-    uploadedName.value = selectedFile.value.name
+  const ok = await doUpload(selectedFile.value)
+  if (ok) {
     selectedFile.value = null
     if (fileInputRef.value) fileInputRef.value.value = ''
     toast.success(props.toastUploadSuccess)
   }
-  catch {
+  else {
     toast.error(props.toastUploadFailed)
-  }
-  finally {
-    isUploading.value = false
   }
 }
 
@@ -120,7 +114,7 @@ function exportFile(): void {
         <p class="truncate text-sm text-[#605BFF]">
           {{ uploadedName ? `${t('settings.card.filePrefix')} ${uploadedName}` : t('settings.card.noFileUploaded') }}
         </p>
-        <div class="flex justify-end">
+        <div class="flex justify-center">
           <button
             :disabled="!uploadedName"
             class="rounded-[10px] bg-[#F29339] px-5 py-2.5 text-sm font-normal text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"

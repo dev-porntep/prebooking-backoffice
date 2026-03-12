@@ -13,7 +13,7 @@ const createClient = (): HttpClientBase => {
 export const backendFetch = async <T>(
   event: H3Event,
   path: string,
-  options?: { method?: string; body?: unknown; query?: Record<string, unknown> },
+  options?: { method?: string; body?: unknown; query?: Record<string, unknown>; headers?: Record<string, string> },
 ): Promise<T> => {
   const client = createClient()
   const token  = event.context['auth']?.token as string | undefined
@@ -26,6 +26,7 @@ export const backendFetch = async <T>(
       'Content-Type':    'application/json',
       'x-correlator-id': txid,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
     },
   }
 

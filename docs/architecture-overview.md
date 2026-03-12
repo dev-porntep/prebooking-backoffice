@@ -246,7 +246,40 @@ for (let i = 0; i < total; i += chunkSize) {
 
 ---
 
-### 5.4 i18n-First Pattern
+### 5.4 Upload Patterns
+
+มี 3 upload contexts ในระบบ แต่ละอันมี composable คนละตัวตาม responsibility:
+
+| Context | Composable | Pinia Store | BFF Route |
+|---------|-----------|-------------|-----------|
+| **Settings config** (quota/dates) | `useSettingsUpload` | ไม่มี | `POST /api/settings/upload/[type]` |
+| **Import wizard** (quota/dates/timeslots) | `useExcelImport` | `importStore` | `POST /api/import/upload` → `/api/import/process` |
+| **Export** | `useExcelExport` | ไม่มี | `POST /api/export/generate` |
+
+> Pinia store จำเป็นเฉพาะเมื่อ state ต้องใช้ข้ามหลาย component หรือ survive การ navigate เท่านั้น
+
+**Settings upload flow** (simple — ไม่มี preview step):
+
+```
+Component
+  └─► useSettingsUpload(uploadApiPath)
+        └─► $fetch(POST FormData)
+              └─► BFF: /api/settings/upload/[type]
+                    │  readMultipartFormData → validate → backendFetch
+                    └─► Backend → S3
+```
+
+**ทำไมถึงใช้ BFF-proxy แทน Presigned S3 URL:**
+- ไฟล์ไม่เกิน 50 MB — BFF proxy รับได้สบาย
+- Token/auth อยู่ server-side ทั้งหมด (ไม่รั่วไป client)
+- ใช้ `HttpClientBase` logging + retry chain เดิมได้เลย
+- Presigned URL ต้องการ: backend endpoint ใหม่ + S3 CORS config + client multipart — ซับซ้อนเกินความจำเป็น
+
+> **Note (pending backend):** `backendFetch` ต้องส่ง Content-Type ที่ถูกต้องเมื่อ proxy binary — `backendProxy.ts` รองรับ `options.headers` override แล้ว ต้องยืนยันกับ backend ว่ารับ raw binary body หรือ `multipart/form-data`
+
+---
+
+### 5.5 i18n-First Pattern
 
 ทุก text ในหน้า UI ต้องผ่าน translation key เสมอ
 

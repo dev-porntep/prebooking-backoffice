@@ -107,7 +107,10 @@ export default defineEventHandler(async (event) => {
       e.endpoint?.toLowerCase().includes(search)
       || e.txid?.toLowerCase().includes(search)
       || e.step_name?.toLowerCase().includes(search)
-      || e.msg?.toLowerCase().includes(search),
+      || e.msg?.toLowerCase().includes(search)
+      || e.method?.toLowerCase().includes(search)
+      || e.result_code?.toLowerCase().includes(search)
+      || e.result_indicator?.toLowerCase().includes(search),
     )
   }
 

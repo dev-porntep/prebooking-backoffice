@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const protectedPaths = ['/api/prebooking', '/api/import', '/api/export']
+  const protectedPaths = ['/api/prebooking', '/api/import', '/api/export', '/api/settings']
   const url = getRequestURL(event)
 
   if (!protectedPaths.some(path => url.pathname.startsWith(path))) return
