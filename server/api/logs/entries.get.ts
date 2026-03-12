@@ -87,7 +87,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    fs.accessSync(resolved, fs.constants.R_OK)
+    await fs.promises.access(resolved, fs.constants.R_OK)
   }
   catch {
     throw createError({ statusCode: 404, statusMessage: 'Log file not found' })

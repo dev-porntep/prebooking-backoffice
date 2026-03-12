@@ -26,7 +26,6 @@
     "axios": "^1.13.6",
     "axios-retry": "^4.5.0",
     "class-variance-authority": "^0.7.1",
-    "exceljs": "^4.4.0",
     "lucide-vue-next": "^0.577.0",
     "nuxt": "^4.3.1",
     "nuxt-auth-utils": "^0.5.29",
@@ -39,8 +38,7 @@
     "vue": "^3.5.29",
     "vue-router": "^4.6.4",
     "vue-sonner": "^2.0.9",
-    "vue3-toastify": "^0.2.9",
-    "xlsx": "^0.18.5"
+    "vue3-toastify": "^0.2.9"
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.96",

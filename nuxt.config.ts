@@ -22,7 +22,7 @@ export default defineNuxtConfig({
       { path: '~/components/settings', pathPrefix: false },
       { path: '~/components/prebooking', pathPrefix: false },
       { path: '~/components/layout', pathPrefix: false },
-      { path: '~/components/ui', pathPrefix: false },
+      { path: '~/components/ui', pathPrefix: false, extensions: ['vue'] },
     ],
   },
 

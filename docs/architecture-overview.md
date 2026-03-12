@@ -1,7 +1,7 @@
 # Architecture Overview — Prebooking Backoffice
 
 > เอกสารสำหรับประชุม dev เพื่อทำความเข้าใจโครงสร้างระบบ
-> อัปเดตล่าสุด: 11 มีนาคม 2026 (rev 2 — SSO direct flow, Vercel deployment)
+> อัปเดตล่าสุด: 12 มีนาคม 2026 (rev 3 — ลบ Import/Export pages ออกจากระบบ)
 
 ---
 
@@ -10,8 +10,7 @@
 **Prebooking Backoffice** คือ internal admin tool สำหรับทีม ops จัดการ pre-order อุปกรณ์มือถือ ฟีเจอร์หลัก:
 
 - ดู Dashboard stats และรายการ prebooking ทั้งหมด
-- Import ข้อมูลจาก Excel (quota, dates, timeslots)
-- Export รายงานเป็น Excel / CSV
+- อัปโหลด Excel สำหรับตั้งค่า Quota และ Pickup Date ผ่านหน้า Settings
 
 **สถานะปัจจุบัน:** Frontend พร้อมทั้งหมด, API routes ทำงานด้วย **mock data** — รอต่อ backend จริง
 
@@ -27,8 +26,6 @@
 | UI Components | **Reka UI v2** | 2.9.0 | Headless — ยืดหยุ่น style 100%, accessible by default |
 | Styling | **Tailwind CSS v4** | 4.2.1 | Utility-first, ไม่มี custom CSS ซ้อนกัน |
 | Forms | **VeeValidate + Zod** | v4 + v3 | Schema validation แบบ type-safe |
-| Excel (server) | **ExcelJS** | 4.4.0 | Streaming read/write — รองรับ large files โดยไม่ OOM |
-| Excel (client) | **xlsx (SheetJS)** | 0.18.5 | Lightweight สำหรับ client-side preview |
 | Auth | **nuxt-auth-utils** | 0.5.29 | SSO/OAuth2 built-in, session management |
 | i18n | **@nuxtjs/i18n** | 10.2.3 | ภาษาไทย default, English สลับได้ |
 | Icons | **Lucide Vue Next** | 0.577.0 | Consistent icon set, tree-shakable |
@@ -46,11 +43,7 @@ prebooking-backoffice/
 │   ├── pages/                    ← Route pages (file-based routing)
 │   │   ├── index.vue             ← Dashboard
 │   │   ├── display.vue           ← Prebooking detail
-│   │   ├── export.vue            ← Export Excel/CSV
-│   │   └── import/
-│   │       ├── quota.vue         ← Import product quota
-│   │       ├── dates.vue         ← Import booking dates
-│   │       └── timeslots.vue     ← Import pickup timeslots
+│   │   └── settings.vue          ← Settings (quota & pickup date upload)
 │   │
 │   ├── layouts/
 │   │   └── default.vue           ← App shell (sidebar + header + breadcrumb)
@@ -61,13 +54,11 @@ prebooking-backoffice/
 │   │       └── button/, input/, table/, dialog/, sheet/, badge/, ...
 │   │
 │   ├── stores/                   ← Pinia stores (auto-imported)
-│   │   ├── prebookingStore.ts    ← State: รายการ + stats + pagination + filters
-│   │   └── importStore.ts        ← State: import job lifecycle
+│   │   └── prebookingStore.ts    ← State: รายการ + stats + pagination + filters
 │   │
 │   ├── composables/              ← Business logic wrappers
 │   │   ├── usePrebooking.ts      ← Expose store refs + helpers
-│   │   ├── useExcelImport.ts     ← Upload → preview → process flow
-│   │   ├── useExcelExport.ts     ← Export job + auto-download
+│   │   ├── useSettingsUpload.ts  ← Upload Excel สำหรับ quota/pickup date (Settings page)
 │   │   └── useAuth.ts            ← Session check, login/logout
 │   │
 │   ├── middleware/
@@ -75,7 +66,7 @@ prebooking-backoffice/
 │   │
 │   ├── types/
 │   │   ├── prebooking.ts         ← Prebooking, PrebookingFilter, PrebookingStats
-│   │   ├── excel.ts              ← ImportPreviewResult, ImportJobStatus, ExportJob
+│   │   ├── settings.ts           ← Settings upload types
 │   │   └── auth.ts               ← SSOUser, UserRole, AuthSession
 │   │
 │   └── utils/
@@ -84,23 +75,17 @@ prebooking-backoffice/
 ├── server/
 │   ├── api/                      ← Nitro API routes (auto-mapped)
 │   │   ├── prebooking/           ← GET (list) / POST (create)
-│   │   ├── import/               ← upload.post, process.post, status/[jobId].get
-│   │   ├── export/               ← generate.post, history.get
-│   │   ├── auth/                 ← sso.get, callback.get
-│   │   └── templates/            ← quota.get, dates.get, timeslots.get
+│   │   ├── settings/             ← upload/[type].post
+│   │   └── auth/                 ← sso.get, callback.get
 │   │
 │   ├── middleware/
 │   │   └── auth.ts               ← Server route guard (401 ถ้าไม่มี session)
 │   │
 │   └── utils/
-│       ├── backendProxy.ts       ← Wrapper สำหรับเรียก external backend API
-│       ├── jobManager.ts         ← In-memory job tracking (Map<jobId, JobStatus>)
-│       ├── excelStreamParser.ts  ← Stream-based Excel parser (ExcelJS WorkbookReader)
-│       ├── excelStreamGenerator.ts ← Stream-based Excel writer (ExcelJS WorkbookWriter)
-│       └── chunkProcessor.ts     ← Process arrays in configurable chunks
+│       └── backendProxy.ts       ← Wrapper สำหรับเรียก external backend API
 │
 ├── i18n/locales/
-│   ├── th.json                   ← Thai (default, 245 lines)
+│   ├── th.json                   ← Thai (default)
 │   └── en.json                   ← English (parallel structure)
 │
 ├── app/assets/fonts/BetterTogether/ ← Custom font (processed by Vite — base URL safe)
@@ -123,7 +108,7 @@ prebooking-backoffice/
 │    ↓ calls                                                   │
 │  Composable (app/composables/use*.ts)                        │
 │    storeToRefs() → reactive refs                             │
-│    helper methods (refresh, delete, export...)               │
+│    helper methods (refresh, delete...)                       │
 │    ↓ uses                                                    │
 │  Pinia Store (app/stores/*.ts)                               │
 │    state: T[] + pagination + loading + error                 │
@@ -195,70 +180,9 @@ onMounted(() => fetchPrebookings({ page: 1, limit: 20 }))
 
 ---
 
-### 5.2 Job-based Async Pattern (Import / Export)
+### 5.2 Settings Upload Pattern (BFF-proxy)
 
-สำหรับ operation ที่ใช้เวลานาน (ประมวลผล Excel ขนาดใหญ่):
-
-```
-Client                          Server
-  │                               │
-  ├─ POST /api/import/upload ────►│ สร้าง job, parse preview
-  │◄─ { jobId, preview } ─────────┤
-  │                               │
-  ├─ POST /api/import/process ───►│ เริ่ม process async
-  │◄─ { jobId } ──────────────────┤
-  │                               │
-  ├─ GET /api/import/status/{id} ►│  ← poll ทุก 2 วินาที
-  │◄─ { status, progress: 45% } ──┤
-  │                               │
-  ├─ GET /api/import/status/{id} ►│
-  │◄─ { status: 'completed' } ────┤ ← หยุด poll
-```
-
-Job states: `pending` → `processing` → `completed` / `failed`
-
----
-
-### 5.3 Excel Streaming Pattern
-
-**ปัญหา:** ไฟล์ 50MB / 100,000 rows จะ OOM ถ้าโหลดทั้งหมดเข้า memory
-
-**วิธีแก้:** ใช้ ExcelJS streaming API
-
-```typescript
-// server/utils/excelStreamParser.ts
-const workbook = new ExcelJS.stream.xlsx.WorkbookReader(stream, {})
-for await (const worksheet of workbook) {
-  for await (const row of worksheet) {
-    // ประมวลผลทีละ row — ไม่เก็บทั้งหมด
-    onRow?.(mapRowToObject(headers, row.values), rowIndex)
-  }
-}
-
-// server/utils/chunkProcessor.ts
-// ส่ง backend ทีละ 500 rows (config: excel.chunkSize)
-for (let i = 0; i < total; i += chunkSize) {
-  const chunk = data.slice(i, i + chunkSize)
-  await processFn(chunk)
-  onProgress?.(processed += chunk.length, total)
-}
-```
-
----
-
-### 5.4 Upload Patterns
-
-มี 3 upload contexts ในระบบ แต่ละอันมี composable คนละตัวตาม responsibility:
-
-| Context | Composable | Pinia Store | BFF Route |
-|---------|-----------|-------------|-----------|
-| **Settings config** (quota/dates) | `useSettingsUpload` | ไม่มี | `POST /api/settings/upload/[type]` |
-| **Import wizard** (quota/dates/timeslots) | `useExcelImport` | `importStore` | `POST /api/import/upload` → `/api/import/process` |
-| **Export** | `useExcelExport` | ไม่มี | `POST /api/export/generate` |
-
-> Pinia store จำเป็นเฉพาะเมื่อ state ต้องใช้ข้ามหลาย component หรือ survive การ navigate เท่านั้น
-
-**Settings upload flow** (simple — ไม่มี preview step):
+Upload flow สำหรับ Settings page (quota/pickup date):
 
 ```
 Component
@@ -279,16 +203,16 @@ Component
 
 ---
 
-### 5.5 i18n-First Pattern
+### 5.3 i18n-First Pattern
 
 ทุก text ในหน้า UI ต้องผ่าน translation key เสมอ
 
 ```typescript
 // เพิ่ม key ใน i18n/locales/th.json และ en.json ก่อน
-{ "import": { "upload": { "title": "อัปโหลดไฟล์" } } }
+{ "settings": { "quota": { "title": "Update Quota" } } }
 
 // ใน template
-{{ $t('import.upload.title') }}
+{{ $t('settings.quota.title') }}
 ```
 
 Structure ของ locale keys:
@@ -296,8 +220,7 @@ Structure ของ locale keys:
 - `nav.*` — เมนู navigation
 - `pages.*` — ชื่อหน้า
 - `home.*` — Dashboard
-- `import.*` — Import flow
-- `export.*` — Export page
+- `settings.*` — Settings page
 - `toast.*` — Notification messages
 - `status.*` — Prebooking status labels
 
@@ -311,10 +234,7 @@ Structure ของ locale keys:
 |-------|------|--------|
 | `/` | `pages/index.vue` | default |
 | `/display` | `pages/display.vue` | default |
-| `/export` | `pages/export.vue` | default |
-| `/import/quota` | `pages/import/quota.vue` | default |
-| `/import/dates` | `pages/import/dates.vue` | default |
-| `/import/timeslots` | `pages/import/timeslots.vue` | default |
+| `/settings` | `pages/settings.vue` | default |
 
 **Server OAuth routes** (ไม่ใช่ Nuxt pages — Nitro handles โดยตรง):
 
@@ -359,7 +279,7 @@ Browser                    Nuxt Client              Nitro Server
 ถ้า `!loggedIn.value` → `navigateTo('/auth/google', { external: true })`
 
 **Server guard** — [server/middleware/auth.ts](../server/middleware/auth.ts):
-ถ้าเรียก `/api/prebooking`, `/api/import`, `/api/export` โดยไม่มี session → HTTP 401
+ถ้าเรียก `/api/prebooking`, `/api/settings` โดยไม่มี session → HTTP 401
 
 **Static build** (`NUXT_PUBLIC_AUTH_ENABLED=false`):
 middleware return early — ไม่มี redirect ใดๆ (ใช้สำหรับ GitHub Pages preview)
@@ -427,8 +347,7 @@ NUXT_PUBLIC_AUTH_ENABLED=true                # false สำหรับ static b
 |-------|-----------|
 | Full-stack เดียว | Nuxt ครอบคลุม frontend + BFF API — ลด context switching |
 | Type safety | TypeScript strict ทั้งหมด — catch errors ก่อน runtime |
-| Large file support | Excel streaming 50MB / 100k rows โดยไม่ OOM |
-| UX ดี | Job polling pattern → ผู้ใช้เห็น progress bar แบบ real-time |
+| UX ดี | Responsive layout, toast notifications, real-time state |
 | UI ยืดหยุ่น | Reka UI headless → ปรับ style ได้ทุกอย่างโดยไม่ override |
 | Dev velocity | Mock data → frontend dev ได้ทันทีโดยไม่รอ backend |
 | i18n พร้อม | เพิ่มภาษาใหม่ได้ง่าย — แค่เพิ่ม locale file |
@@ -438,28 +357,10 @@ NUXT_PUBLIC_AUTH_ENABLED=true                # false สำหรับ static b
 
 | ข้อเสีย | ผลกระทบ | วิธีแก้ |
 |--------|--------|--------|
-| **Job manager = in-memory** | Restart server แล้ว job ที่กำลัง process หาย | ย้ายไป Redis / database |
 | **Mock API ทั้งหมด** | ยังใช้งานจริงไม่ได้ | ต่อ backendFetch() เมื่อ backend พร้อม |
 | **ไม่มี test framework** | ไม่มี test coverage | เพิ่ม Vitest + Playwright (unit tests ใน `tests/unit/`, E2E tests ใน `tests/e2e/`) |
 | **Nuxt 4 ใหม่มาก** | Community resource น้อยกว่า v3 | ดู official docs + migration guide |
 | **SSO direct redirect** | ถ้า OAuth error จะ loop กลับ Google | error ปัจจุบัน retry /auth/google |
-
-### ความเหมาะสม
-
-✅ **เหมาะมากสำหรับ:**
-- Internal admin tools (ผู้ใช้น้อย, ใช้งานหนัก)
-- Team เล็ก-กลาง ที่ต้องการ full-stack JS
-- งานที่ต้องการ Excel import/export ขนาดใหญ่
-- ระบบที่ต้องการ SSO integration
-
-⚠️ **อาจ over-engineered สำหรับ:**
-- CRUD-only app ไม่มี file processing
-- กรณีที่ backend ทำ business logic ทั้งหมด และ frontend แค่แสดงผล
-
-📈 **Scale ได้ถ้า:**
-- แทน in-memory job manager ด้วย BullMQ + Redis
-- ใช้ CDN สำหรับ generated Excel files
-- เพิ่ม rate limiting บน upload endpoints
 
 ---
 
@@ -470,18 +371,16 @@ NUXT_PUBLIC_AUTH_ENABLED=true                # false สำหรับ static b
 - [x] Font ใช้ Vite asset pipeline (รองรับ base URL ทุก deployment)
 - [x] Vercel deployment workflow (`.github/workflows/deploy-vercel.yml`)
 - [x] `.env.example` ด้วย env vars ที่ถูกต้อง
+- [x] Settings page: upload quota / pickup date ผ่าน BFF-proxy
 
 ### Pending
-- [ ] **ต่อ backend API จริง** — เริ่มจาก endpoints สำคัญ: `/api/prebooking`, `/api/import`, `/api/export` (แทน mock responses ทุก route ด้วย `backendFetch()`)
-- [ ] **Job persistence** — ย้าย `jobManager.ts` จาก in-memory Map → Redis / DB
+- [ ] **ต่อ backend API จริง** — เริ่มจาก endpoints สำคัญ: `/api/prebooking`, `/api/settings/upload` (แทน mock responses ด้วย `backendFetch()`)
 - [ ] **Test framework** — เพิ่ม Vitest (unit) + Playwright (E2E)
-- [ ] **Export polling** — เพิ่ม status endpoint สำหรับ export job (server) และเพิ่ม client polling logic
-- [ ] **Multipart upload** — ทำ real streaming upload แทน mock
 - [ ] **Error monitoring** — เพิ่ม Sentry หรือ equivalent
-- [ ] **Rate limiting** — เพิ่มบน `/api/import/upload`
-- [ ] **OAuth error page** — แสดง error message แทน retry loop เมื่อ Google OAuth fail  
-      - ควร redirect ไปหน้า `/auth/error` เมื่อเกิด OAuth error  
-      - หน้า error ควรแสดงข้อความที่ user-friendly, มีปุ่ม retry และ support contact  
+- [ ] **Rate limiting** — เพิ่มบน `/api/settings/upload`
+- [ ] **OAuth error page** — แสดง error message แทน retry loop เมื่อ Google OAuth fail
+      - ควร redirect ไปหน้า `/auth/error` เมื่อเกิด OAuth error
+      - หน้า error ควรแสดงข้อความที่ user-friendly, มีปุ่ม retry และ support contact
       - ใช้ layout เดียวกับ default, แต่เน้น error state (icon + สีแดง)
 
 ---
@@ -497,4 +396,4 @@ NUXT_PUBLIC_AUTH_ENABLED=true                # false สำหรับ static b
 | เปลี่ยน config | `nuxt.config.ts` |
 | ดู type definitions | `app/types/` |
 | Auth flow | `app/middleware/auth.global.ts` + `server/routes/auth/google.get.ts` |
-| Excel processing | `server/utils/excelStream*.ts` + `server/utils/chunkProcessor.ts` |
+| Settings upload | `app/composables/useSettingsUpload.ts` + `server/api/settings/` |
