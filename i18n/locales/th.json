@@ -251,6 +251,70 @@
       "raw": "Raw JSON"
     }
   },
+  "settings": {
+    "pageTitle": "ตั้งค่า",
+    "quota": {
+      "title": "Update Quota",
+      "description": "Upload file สำหรับ update Quota (สามารถ update ทับได้)",
+      "filenamePlaceholder": "File name - xxxxx_DD_MM_YYYY.xlsx"
+    },
+    "pickupDate": {
+      "title": "Pickup date",
+      "description": "Upload file สำหรับ setup ตารางวันที่จองและวันที่รับสินค้าของรอบปกติ (สามารถ update ทับได้)",
+      "filenamePlaceholder": "File name - xxxxx_MM_YYYY.xlsx"
+    },
+    "card": {
+      "browseFile": "Browse file",
+      "excelNote": "excel file (.xlsx) เท่านั้น",
+      "upload": "Upload",
+      "noFileUploaded": "ยังไม่มีไฟล์ที่อัปโหลด",
+      "filePrefix": "File ::",
+      "exportXlsx": "Export .xlsx"
+    }
+  },
+  "prebooking": {
+    "pageTitle": "Booking List",
+    "filter": {
+      "bookingNumber": "หมายเลข Booking",
+      "shop": "สาขาที่รับ / Shop",
+      "status": "สถานะการจอง",
+      "search": "ค้นหา"
+    },
+    "list": {
+      "emptyState": "ไม่พบข้อมูล",
+      "col": {
+        "bookingNumber": "หมายเลขการจอง",
+        "customer": "ชื่อลูกค้า",
+        "shop": "ข้อมูล Shop",
+        "statusBooking": "การจอง",
+        "statusPayment": "การจ่ายมัดจำ",
+        "product": "ชื่อสินค้า",
+        "statusDelivery": "การรับสินค้า",
+        "action": "Action"
+      },
+      "row": {
+        "channel": "ช่องทาง",
+        "bookingDate": "วันที่จอง",
+        "phone": "T",
+        "email": "M",
+        "receiptBooking": "Receipt Booking",
+        "receiptPayment": "Receipt Payment",
+        "bookedAt": "จองที่",
+        "pickupAt": "รับที่",
+        "date": "วันที่",
+        "time": "เวลา",
+        "imeiPrefix": "IMIE"
+      }
+    },
+    "actions": {
+      "viewDetail": "ดูรายละเอียด",
+      "viewPrint": "ดูหน้าสั่งพิมพ์",
+      "viewLog": "ดู Log",
+      "cancelBooking": "ยกเลิก Booking",
+      "edit": "แก้ไข",
+      "print": "สั่งพิมพ์"
+    }
+  },
   "toast": {
     "login": {
       "error": "เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง"
@@ -266,6 +330,14 @@
     },
     "home": {
       "refreshed": "อัปเดตข้อมูลเรียบร้อยแล้ว"
+    },
+    "settings": {
+      "invalidFileType": "กรุณาเลือกไฟล์ excel (.xlsx) เท่านั้น",
+      "uploadFailed": "อัปโหลดล้มเหลว กรุณาลองใหม่",
+      "quotaUploadSuccess": "อัปโหลด Quota สำเร็จ",
+      "pickupDateUploadSuccess": "อัปโหลด Pickup date สำเร็จ",
+      "quotaExporting": "กำลัง Export Quota...",
+      "pickupDateExporting": "กำลัง Export Pickup date..."
     }
   }
 }

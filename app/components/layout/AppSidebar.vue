@@ -46,7 +46,7 @@ const isActive = (path: string) => route.path.startsWith(path)
       <!-- Logo SVG -->
       <img src="~/assets/icon/Subtract.svg" alt="Pre Booking" class="size-[42px] shrink-0" >
       <!-- App name -->
-      <span class="text-2xl font-bold text-[#030229]" style="font-family: 'Nunito', sans-serif;">Pre Booking</span>
+      <span class="whitespace-nowrap text-2xl font-bold text-[#030229]" style="font-family: 'Nunito', sans-serif;">Pre Booking</span>
       <!-- Mobile close button -->
       <button
         class="ml-auto flex size-7 shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 lg:hidden"

@@ -251,6 +251,70 @@
       "raw": "Raw JSON"
     }
   },
+  "settings": {
+    "pageTitle": "Settings",
+    "quota": {
+      "title": "Update Quota",
+      "description": "Upload file to update Quota (existing data will be overwritten)",
+      "filenamePlaceholder": "File name - xxxxx_DD_MM_YYYY.xlsx"
+    },
+    "pickupDate": {
+      "title": "Pickup Date",
+      "description": "Upload file to setup booking and pickup date schedule for regular rounds (existing data will be overwritten)",
+      "filenamePlaceholder": "File name - xxxxx_MM_YYYY.xlsx"
+    },
+    "card": {
+      "browseFile": "Browse file",
+      "excelNote": "Excel file (.xlsx) only",
+      "upload": "Upload",
+      "noFileUploaded": "No file uploaded yet",
+      "filePrefix": "File ::",
+      "exportXlsx": "Export .xlsx"
+    }
+  },
+  "prebooking": {
+    "pageTitle": "Booking List",
+    "filter": {
+      "bookingNumber": "Booking Number",
+      "shop": "Pickup Branch / Shop",
+      "status": "Booking Status",
+      "search": "Search"
+    },
+    "list": {
+      "emptyState": "No data found",
+      "col": {
+        "bookingNumber": "Booking Number",
+        "customer": "Customer Name",
+        "shop": "Shop Info",
+        "statusBooking": "Booking",
+        "statusPayment": "Deposit",
+        "product": "Product Name",
+        "statusDelivery": "Delivery",
+        "action": "Action"
+      },
+      "row": {
+        "channel": "Channel",
+        "bookingDate": "Booking Date",
+        "phone": "T",
+        "email": "M",
+        "receiptBooking": "Receipt Booking",
+        "receiptPayment": "Receipt Payment",
+        "bookedAt": "Booked at",
+        "pickupAt": "Pickup at",
+        "date": "Date",
+        "time": "Time",
+        "imeiPrefix": "IMEI"
+      }
+    },
+    "actions": {
+      "viewDetail": "View Detail",
+      "viewPrint": "View Print Page",
+      "viewLog": "View Log",
+      "cancelBooking": "Cancel Booking",
+      "edit": "Edit",
+      "print": "Print"
+    }
+  },
   "toast": {
     "login": {
       "error": "Login failed. Please try again."
@@ -266,6 +330,14 @@
     },
     "home": {
       "refreshed": "Data refreshed successfully"
+    },
+    "settings": {
+      "invalidFileType": "Please select an Excel file (.xlsx) only",
+      "uploadFailed": "Upload failed. Please try again.",
+      "quotaUploadSuccess": "Quota uploaded successfully",
+      "pickupDateUploadSuccess": "Pickup date uploaded successfully",
+      "quotaExporting": "Exporting Quota...",
+      "pickupDateExporting": "Exporting Pickup date..."
     }
   }
 }
