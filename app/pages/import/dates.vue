@@ -208,7 +208,7 @@ const fileSizeLabel = computed(() => {
         </div>
 
         <!-- Divider -->
-        <div class="hidden h-10 w-px bg-slate-200 dark:bg-white/10 sm:block" />
+        <div class="hidden h-10 w-px bg-slate-200 dark:bg-white/10 md:block" />
 
         <!-- Branch -->
         <div class="flex shrink-0 items-center gap-2 rounded-xl border border-slate-200/80 bg-slate-50 px-4 py-3 dark:border-white/[0.07] dark:bg-white/[0.03]">

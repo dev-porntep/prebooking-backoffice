@@ -46,11 +46,12 @@ export default defineNuxtConfig({
     }],
   ],
 
-  // Use cookie-based storage so SSR and client agree on initial color mode
+  // Light mode only — no dark mode support
   colorMode: {
-    preference: 'dark',
-    fallback: 'dark',
+    preference: 'light',
+    fallback: 'light',
     storageKey: 'color-mode',
+    classSuffix: '',
   },
 
   runtimeConfig: {

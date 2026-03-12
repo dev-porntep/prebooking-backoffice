@@ -23,7 +23,7 @@ const PAGE_SIZE = 50
 const MAX_FIELD_LENGTH = 2_000 // chars per large string field
 
 const truncateLargeFields = (entry: LogEntry): LogEntry => {
-  const result = { ...entry } as Record<string, any>
+  const result = { ...entry } as Record<string, unknown>
   for (const key in result) {
     if (typeof result[key] === 'string') {
       if (result[key].length > MAX_FIELD_LENGTH) {
